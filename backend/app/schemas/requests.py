@@ -17,3 +17,10 @@ class UserUpdatePasswordRequest(BaseRequest):
 class UserCreateRequest(BaseRequest):
     email: EmailStr
     password: str
+    full_name: str
+
+
+class AdCreateRequest(BaseRequest):
+    title: str
+    description: str
+    price: int

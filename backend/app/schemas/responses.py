@@ -16,3 +16,10 @@ class AccessTokenResponse(BaseResponse):
 class UserResponse(BaseResponse):
     user_id: str
     email: EmailStr
+
+
+class AdResponse(BaseResponse):
+    ad_id: str
+    title: str
+    description: str
+    user_id: str
