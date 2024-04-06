@@ -15,13 +15,23 @@ from app.core import database_session
 from app.core.config import get_settings
 from app.core.security.jwt import create_jwt_token
 from app.core.security.password import get_password_hash
+from app.main import app
 from app.main import app as fastapi_app
-from app.models import Base, User
+from app.models import Ad, Base, User
 
 default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
 default_user_email = "geralt@wiedzmin.pl"
 default_user_password = "geralt"
+default_user_full_name = "geralt of rivia"
+default_user_is_customer = False
 default_user_access_token = create_jwt_token(default_user_id).access_token
+
+second_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087c"
+second_user_email = "jean@wiedzmin.pl"
+second_user_password = "jean"
+second_user_full_name = "jean of rivia"
+second_user_is_customer = False
+second_user_access_token = create_jwt_token(second_user_id).access_token
 
 
 @pytest.fixture(scope="session")
@@ -82,6 +92,11 @@ async def fixture_default_hashed_password() -> str:
     return get_password_hash(default_user_password)
 
 
+@pytest_asyncio.fixture(name="second_hashed_password", scope="session")
+async def fixture_second_hashed_password() -> str:
+    return get_password_hash(second_user_password)
+
+
 @pytest_asyncio.fixture(name="session", scope="function")
 async def fixture_session_with_rollback(
     monkeypatch: pytest.MonkeyPatch,
@@ -123,6 +138,8 @@ async def fixture_default_user(
         user_id=default_user_id,
         email=default_user_email,
         hashed_password=default_hashed_password,
+        full_name=default_user_full_name,
+        is_customer=default_user_is_customer,
     )
     session.add(default_user)
     await session.commit()
@@ -130,6 +147,45 @@ async def fixture_default_user(
     return default_user
 
 
+@pytest_asyncio.fixture(name="second_user", scope="function")
+async def fixture_second_user(
+    session: AsyncSession, second_hashed_password: str
+) -> User:
+    second_user = User(
+        user_id=second_user_id,
+        email=second_user_email,
+        hashed_password=second_hashed_password,
+        full_name=second_user_full_name,
+        is_customer=second_user_is_customer,
+    )
+    session.add(second_user)
+    await session.commit()
+    await session.refresh(second_user)
+    return second_user
+
+
 @pytest.fixture(name="default_user_headers", scope="function")
 def fixture_default_user_headers(default_user: User) -> dict[str, str]:
     return {"Authorization": f"Bearer {default_user_access_token}"}
+
+
+@pytest.fixture(name="second_user_headers", scope="function")
+def fixture_second_user_headers(second_user: User) -> dict[str, str]:
+    return {"Authorization": f"Bearer {second_user_access_token}"}
+
+
+@pytest_asyncio.fixture(name="create_ad", scope="function")
+async def fixture_create_ad(
+    client: AsyncClient,
+    default_user_headers: dict[str, str],
+) -> Ad:
+    response = await client.post(
+        app.url_path_for("create_new_ad"),
+        headers=default_user_headers,
+        json={
+            "title": "test weapon",
+            "description": "This is the weapons description",
+            "price": 1000,
+        },
+    )
+    return response
