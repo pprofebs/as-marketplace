@@ -24,3 +24,6 @@ class AdCreateRequest(BaseRequest):
     title: str
     description: str
     price: int
+    images: list[str]
+    category: str
+    condition: str

@@ -20,9 +20,11 @@ app.include_router(ad_router)
 # Sets all CORS enabled origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        str(origin) for origin in get_settings().security.backend_cors_origins
-    ],
+    # TODO: Figure out why getting this from the settings is not working
+    # allow_origins=[
+    #    str(origin) for origin in get_settings().security.backend_cors_origins
+    # ],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

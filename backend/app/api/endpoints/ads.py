@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import api_messages, deps
-from app.models import Ad, User
+from app.models import Ad, ImageUrl, User
 from app.schemas.requests import AdCreateRequest
 from app.schemas.responses import AdResponse
 
@@ -69,10 +69,15 @@ async def create_new_ad(
         title=data.title,
         description=data.description,
         price=data.price,
+        category=data.category,
+        condition=data.condition,
         user_id=current_user.user_id,
     )
 
+    image_urls = [ImageUrl(url=url, ad=new_ad) for url in data.images]
+
     session.add(new_ad)
+    session.add_all(image_urls)
 
     try:
         await session.commit()
@@ -160,6 +165,22 @@ async def get_all_my_ads(
     status_code=status.HTTP_200_OK,
     description="Get all ads sorted by their last updated time.",
 )
-async def get_all_ads(session: AsyncSession = Depends(deps.get_session)) -> list[Ad]:
+async def get_all_ads(
+    session: AsyncSession = Depends(deps.get_session),
+) -> list[AdResponse]:
     ads = await session.execute(select(Ad).order_by(desc(Ad.update_time)))
-    return [AdResponse.model_validate(ad) for ad in ads.scalars()]
+    ad_responses = []
+    for ad in ads.scalars():
+        image_urls = [{"url": img.url} for img in ad.images]
+        ad_response = AdResponse(
+            ad_id=ad.ad_id,
+            title=ad.title,
+            description=ad.description,
+            user_id=ad.user_id,
+            images=image_urls,
+            category=ad.category,
+            condition=ad.condition,
+        )
+        ad_responses.append(ad_response)
+
+    return ad_responses

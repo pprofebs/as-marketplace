@@ -18,8 +18,15 @@ class UserResponse(BaseResponse):
     email: EmailStr
 
 
+class ImageUrl(BaseModel):
+    url: str
+
+
 class AdResponse(BaseResponse):
     ad_id: str
     title: str
     description: str
     user_id: str
+    images: list[ImageUrl]
+    category: str
+    condition: str

@@ -83,3 +83,21 @@ class Ad(Base):
         Uuid(as_uuid=False), ForeignKey("user_account.user_id"), nullable=False
     )
     user: Mapped["User"] = relationship("User", back_populates="ads")
+    images: Mapped[list["ImageUrl"]] = relationship(
+        "ImageUrl", back_populates="ad", cascade="all, delete-orphan", lazy="selectin"
+    )
+    category: Mapped[str] = mapped_column(String(256), nullable=False)
+    condition: Mapped[str] = mapped_column(String(256), nullable=False)
+
+
+class ImageUrl(Base):
+    __tablename__ = "images"
+
+    id: Mapped[str] = mapped_column(
+        Uuid(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
+    )
+    url: Mapped[str] = mapped_column(String(256), nullable=False)
+    ad_id: Mapped[str] = mapped_column(
+        Uuid(as_uuid=False), ForeignKey("ads.ad_id"), nullable=False
+    )
+    ad: Mapped["Ad"] = relationship("Ad", back_populates="images")
