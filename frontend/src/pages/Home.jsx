@@ -7,10 +7,10 @@ import BenefitSection from "../components/features/Sections/BenefitsSection";
 function Home () {
     return (
         <div>
-            <HeroSection title={"Buy your used airsoft gun from here"} secondaryTitle={"Give me some sweet money from the ads."}/>
-            <ProductSection/> 
+            <HeroSection title={"Az airsoft piactér"} secondaryTitle={"Találd meg a tökéletes airsoft felszerelést következő játékodhoz"}/>
+            <ProductSection/>
             <BenefitSection />
-            <TestimonialSection />      
+            <TestimonialSection />
         </div>
     )
 }

@@ -1,101 +1,133 @@
-import React from 'react';
-// https://dev.to/ajones_codes/a-better-guide-to-forms-in-react-47f0
-function SubmitAd() {
+import React, { useState } from 'react';
+
+const SubmitAd = () => {
+  const [imagePreviews, setImagePreviews] = useState([]);
+
+  // Function to handle file input change and generate image previews
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    // Map through selected files and create URL for preview
+    const previews = files.map((file) => URL.createObjectURL(file));
+
+    // Update state with image previews
+    setImagePreviews(previews);
+  };
+
   return (
-    <div className="min-h-screen p-6 bg-gray-100 flex items-center justify-center">
-      <div className="container max-w-screen-lg mx-auto">
-        <div>
-          <h2 className="font-semibold text-xl text-gray-600">Submit Your Airsoft Replica Ad</h2>
-          <p className="text-gray-500 mb-6">Please fill out all the fields to submit your ad.</p>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="max-w-xl w-full bg-white p-8 rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Submit Your Airsoft Replica Ad</h2>
 
-          <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
-            <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 lg:grid-cols-3">
-              <div className="text-gray-600">
-                <p className="font-medium text-lg">Personal Details</p>
-                <p>Please provide your contact information.</p>
-              </div>
-
-              <div className="lg:col-span-2">
-                <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-2">
-                  <div>
-                    <label htmlFor="full_name">Full Name</label>
-                    <input type="text" name="full_name" id="full_name" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" />
-                  </div>
-
-                  <div>
-                    <label htmlFor="email">Email Address</label>
-                    <input type="text" name="email" id="email" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="email@domain.com" />
-                  </div>
-
-                  <div>
-                    <label htmlFor="phone">Phone Number</label>
-                    <input type="text" name="phone" id="phone" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="e.g., +1234567890" />
-                  </div>
-
-                  <div>
-                    <label htmlFor="location">Location</label>
-                    <input type="text" name="location" id="location" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="e.g., City, Country" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <div className="text-gray-600">
-                <p className="font-medium text-lg">Airsoft Replica Details</p>
-                <p>Please provide details about your airsoft replica.</p>
-              </div>
-
-              <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-2">
-                <div>
-                  <label htmlFor="adTitle">Ad Title</label>
-                  <input type="text" name="adTitle" id="adTitle" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" />
-                </div>
-
-                <div>
-                  <label htmlFor="description">Description</label>
-                  <textarea id="description" name="description" className="h-24 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="Enter a description"></textarea>
-                </div>
-
-                <div>
-                  <label htmlFor="price">Price</label>
-                  <input type="text" name="price" id="price" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="Enter price" />
-                </div>
-
-                <div>
-                  <label htmlFor="condition">Condition</label>
-                  <select id="condition" name="condition" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50">
-                    <option value="">Select Condition</option>
-                    <option value="new">New</option>
-                    <option value="used">Used</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="category">Category</label>
-                  <select id="category" name="category" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50">
-                    <option value="">Select Category</option>
-                    <option value="rifle">Rifle</option>
-                    <option value="pistol">Pistol</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="images">Upload Images</label>
-                  <input type="file" name="images" id="images" className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" multiple />
-                  <p className="text-xs text-gray-500">You can upload multiple images. Maximum file size: 5MB each.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+        <form className="space-y-6">
+          {/* Personal Details */}
+          <div>
+            <p className="text-lg font-semibold text-gray-700 mb-2">Personal Details</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <input
+                type="text"
+                name="full_name"
+                id="full_name"
+                placeholder="Full Name"
+                className="input-field"
+              />
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Email Address"
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="phone"
+                id="phone"
+                placeholder="Phone Number"
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="location"
+                id="location"
+                placeholder="Location (City, Country)"
+                className="input-field"
+              />
             </div>
           </div>
-        </div>
+
+          {/* Airsoft Replica Details */}
+          <div>
+            <p className="text-lg font-semibold text-gray-700 mb-2">Airsoft Replica Details</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                name="adTitle"
+                id="adTitle"
+                placeholder="Ad Title"
+                className="input-field"
+              />
+              <textarea
+                name="description"
+                id="description"
+                rows="6" // Increase rows for a taller textarea
+                placeholder="Description"
+                className="input-field resize-none col-span-2" // Prevent textarea resizing and span across two columns
+              ></textarea>
+              <input
+                type="text"
+                name="price"
+                id="price"
+                placeholder="Price"
+                className="input-field"
+              />
+              <select name="condition" id="condition" className="input-field">
+                <option value="" disabled selected>
+                  Select Condition
+                </option>
+                <option value="new">New</option>
+                <option value="used">Used</option>
+              </select>
+              <select name="category" id="category" className="input-field">
+                <option value="" disabled selected>
+                  Select Category
+                </option>
+                <option value="rifle">Rifle</option>
+                <option value="pistol">Pistol</option>
+              </select>
+              <input
+                type="file"
+                name="images"
+                id="images"
+                className="input-field"
+                onChange={handleFileChange}
+                multiple
+              />
+              <div className="flex flex-wrap -mx-4">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="w-1/3 px-4 mb-4">
+                    <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-auto rounded-lg" />
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                You can upload multiple images. Maximum file size: 5MB each.
+              </p>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="text-center">
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
-}
+};
 
 export default SubmitAd;
