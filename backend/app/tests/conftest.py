@@ -186,6 +186,12 @@ async def fixture_create_ad(
             "title": "test weapon",
             "description": "This is the weapons description",
             "price": 1000,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
     return response

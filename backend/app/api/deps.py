@@ -1,4 +1,7 @@
+import smtplib
 from collections.abc import AsyncGenerator
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -33,3 +36,29 @@ async def get_current_user(
             detail=api_messages.JWT_ERROR_USER_REMOVED,
         )
     return user
+
+
+def send_confirmation_email(
+    email: str, site_url: str, confirmation_token: str
+) -> dict[str, str]:
+    smtp_server = "smtp.gmail.com"
+    smpt_port = 587
+    smtp_username = "peterpautomation@gmail.com"
+    smpt_password = "npmo qlbg pxpt ozwp "
+
+    sender_email = ""
+    subject = ""
+
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = email
+    message["Subject"] = subject
+
+    confirmation_link = f"{site_url}confirm-email?token={confirmation_token}"
+    body = f"Please click the following link to confirm your email address: {confirmation_link}"
+    message.attach(MIMEText(body, "plain"))
+
+    with smtplib.SMTP(smtp_server, smpt_port) as server:
+        server.starttls()
+        server.login(smtp_username, smpt_password)
+        server.sendmail(sender_email, email, message.as_string())

@@ -175,10 +175,14 @@ async def register_new_user(
             detail=api_messages.EMAIL_ADDRESS_ALREADY_USED,
         )
 
+    confirmation_token = secrets.token_urlsafe(32)
+
     user = User(
         email=new_user.email,
         hashed_password=get_password_hash(new_user.password),
         full_name=new_user.full_name,
+        confirmation_token=confirmation_token,
+        is_active=False,
     )
     session.add(user)
 
@@ -192,4 +196,29 @@ async def register_new_user(
             detail=api_messages.EMAIL_ADDRESS_ALREADY_USED,
         )
 
+    deps.send_confirmation_email(
+        user.email, "http://127.0.0.1:8000/auth/", confirmation_token
+    )
+
     return user
+
+
+@router.get("/confirm-email/")
+async def confirm_email(token: str, session: AsyncSession = Depends(deps.get_session)):
+    print(f"Received token: {token}")
+    user = await session.scalar(select(User).where(User.confirmation_token == token))
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid confirmation token"
+        )
+
+    if user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This token has already been used for confirmation",
+        )
+
+    user.is_active = True
+    user.confirmation_token = None
+    await session.commit()
+    return {"message": "Email confirmed successfully"}
