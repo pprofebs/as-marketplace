@@ -1,57 +1,112 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { UserContext } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
+import LoginPage from './Login';
+import GenericInput from '../components/features/Input/GenericInput';
+import GenericSelect from '../components/features/Select/GenericSelect';
+import DescriptionTextarea from '../components/features/Textarea/DescriptionTextArea';
+import ImageUpload from '../components/features/Form/ImageUpload';
+
 
 const SubmitAd = () => {
+  const [token, setToken] = useContext(UserContext);
+  const navigate = useNavigate();
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    location: '',
+    adTitle: '',
+    description: '',
+    price: '',
+    condition: '',
+    category: '',
+    images: [],
+  });
 
-  // Function to handle file input change and generate image previews
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-
-    // Map through selected files and create URL for preview
     const previews = files.map((file) => URL.createObjectURL(file));
 
     // Update state with image previews
     setImagePreviews(previews);
+
+    setFormData({ ...formData, images: files });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formDataToSend = new FormData();
+    for (const key in formData) {
+      if (formData.hasOwnProperty(key)) {
+        if (key === 'images') {
+          formData[key].forEach((file) => {
+            formDataToSend.append('images', file);
+          });
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
+      }
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/ads/create', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Ad created:', data);
+        // Handle success (e.g., show success message, redirect user)
+      } else {
+        const errorData = await response.json();
+        console.error('Ad creation failed:', errorData.detail);
+        // Handle error (e.g., display error message to user)
+      }
+    } catch (error) {
+      console.error('Ad creation error:', error);
+      // Handle network error or other exceptions
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const conditionOptions = [
+    { label: 'New', value: 'new' },
+    { label: 'Used', value: 'used' },
+    // Add more options as needed...
+  ];
+
+  const categoryOptions = [
+    { label: 'Rifle', value: 'rifle' },
+    { label: 'Pistol', value: 'pistol' },
+    // Add more options as needed...
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+    <div>
+    {!token ? (
+      <LoginPage/>
+
+     ): (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="max-w-xl w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Submit Your Airsoft Replica Ad</h2>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {/* Personal Details */}
           <div>
             <p className="text-lg font-semibold text-gray-700 mb-2">Personal Details</p>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <input
-                type="text"
-                name="full_name"
-                id="full_name"
-                placeholder="Full Name"
-                className="input-field"
-              />
-              <input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="Email Address"
-                className="input-field"
-              />
-              <input
-                type="text"
-                name="phone"
-                id="phone"
-                placeholder="Phone Number"
-                className="input-field"
-              />
-              <input
-                type="text"
-                name="location"
-                id="location"
-                placeholder="Location (City, Country)"
-                className="input-field"
-              />
+              <GenericInput type={"text"} name={"phone"} id={"phone"} placeholder={"Phone Number"} handleChange={handleChange} />
+              <GenericInput type={"text"} name={"location"} id={"location"} placeholder={"Location (City, Country)"} handleChange={handleChange} />
             </div>
           </div>
 
@@ -59,59 +114,14 @@ const SubmitAd = () => {
           <div>
             <p className="text-lg font-semibold text-gray-700 mb-2">Airsoft Replica Details</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                name="adTitle"
-                id="adTitle"
-                placeholder="Ad Title"
-                className="input-field"
-              />
-              <textarea
-                name="description"
-                id="description"
-                rows="6" // Increase rows for a taller textarea
-                placeholder="Description"
-                className="input-field resize-none col-span-2" // Prevent textarea resizing and span across two columns
-              ></textarea>
-              <input
-                type="text"
-                name="price"
-                id="price"
-                placeholder="Price"
-                className="input-field"
-              />
-              <select name="condition" id="condition" className="input-field">
-                <option value="" disabled selected>
-                  Select Condition
-                </option>
-                <option value="new">New</option>
-                <option value="used">Used</option>
-              </select>
-              <select name="category" id="category" className="input-field">
-                <option value="" disabled selected>
-                  Select Category
-                </option>
-                <option value="rifle">Rifle</option>
-                <option value="pistol">Pistol</option>
-              </select>
-              <input
-                type="file"
-                name="images"
-                id="images"
-                className="input-field"
-                onChange={handleFileChange}
-                multiple
-              />
-              <div className="flex flex-wrap -mx-4">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="w-1/3 px-4 mb-4">
-                    <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-auto rounded-lg" />
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500">
-                You can upload multiple images. Maximum file size: 5MB each.
-              </p>
+              <GenericInput type={"text"} name={"adTitle"} id={"adtitle"} placeholder={"Ad Title"} handleChange={handleChange} />
+              <DescriptionTextarea name={"description"} id={"description"} placeholder={"Description"} />
+              <GenericInput type={"text"} name={"price"} id={"price"} placeholder={"Price"} handleChange={handleChange} />
+              <GenericSelect name={"condition"} id={"condition"} options={conditionOptions} placeholder={"Select Condition"} handleChange={handleChange} />
+              <GenericSelect name={"category"} id={"category"} options={categoryOptions} placeholder={"Select Category"} handleChange={handleChange} />
+
+
+             <ImageUpload handleFileChange={handleFileChange} imagePreviews={imagePreviews} />
             </div>
           </div>
 
@@ -127,6 +137,8 @@ const SubmitAd = () => {
         </form>
       </div>
     </div>
+     )}
+     </div>
   );
 };
 

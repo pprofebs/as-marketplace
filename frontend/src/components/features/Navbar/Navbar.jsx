@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { UserContext } from '../../../context/UserContext';
+
 
 const Navbar = () => {
+  const [token, setToken] = useContext(UserContext);
+
+  const handleLogout = () => {
+      setToken(null);
+  };
+
   return (
     <nav className="bg-[#2c3e50] text-white py-4">
       <div className="container mx-auto px-4 flex justify-between items-center">
@@ -26,6 +34,8 @@ const Navbar = () => {
           </li>
         </ul>
         <div>
+        {!token ? (
+        <div>
           <Link to="/belepes" className="hidden lg:inline-block mr-4 hover:text-gray-300">
             Bejelentkezés
           </Link>
@@ -33,6 +43,15 @@ const Navbar = () => {
             Regisztráció
           </Link>
         </div>
+      ) : (
+        <>
+          <p>Table</p>
+          <button onClick={handleLogout}>
+            Logout
+          </button>
+        </>
+      )}
+    </div>
       </div>
     </nav>
   );

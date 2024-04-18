@@ -7,6 +7,8 @@ import AdsPage from "./pages/Products";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/SignUp";
 import ProductDetail from "./pages/ProductDetail";
+import RegistrationSuccessPage from "./pages/RegistrationSuccess";
+import { UserProvider } from './context/UserContext';
 
 
 export default function App() {
@@ -26,6 +28,10 @@ export default function App() {
         {
           path: "/regisztracio",
           element: <SignupPage />
+        },
+        {
+          path: "/sikeres-regisztracio",
+          element: <RegistrationSuccessPage />
         },
         {
           path: "/belepes",
@@ -53,6 +59,7 @@ function Root() {
         <Route path="/termekek/:id" element={<ProductDetail/>} />
         <Route path="/belepes" element={<LoginPage/>} />
         <Route path="/regisztracio" element={<SignupPage/>} />
+        <Route path="/sikeres-regisztracio" element={<RegistrationSuccessPage/>} />
       </Route>
     </Routes>
   )
@@ -61,9 +68,11 @@ function Root() {
 function Layout() {
   return (
     <>
+    <UserProvider>
       <Navbar />
       <Outlet />
       <Footer />
+    </UserProvider>
     </>
   );
 }
