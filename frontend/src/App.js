@@ -56,7 +56,7 @@ function Root() {
         <Route path="/" element={<Home />} />
         <Route path="/adj-fel-hirdetest" element={<Ad />} />
         <Route path="/termekek" element={<AdsPage/>} />
-        <Route path="/termekek/:id" element={<ProductDetail/>} />
+        <Route path="/termekek/:adId" element={<ProductDetail/>} />
         <Route path="/belepes" element={<LoginPage/>} />
         <Route path="/regisztracio" element={<SignupPage/>} />
         <Route path="/sikeres-regisztracio" element={<RegistrationSuccessPage/>} />

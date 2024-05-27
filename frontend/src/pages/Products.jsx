@@ -15,7 +15,6 @@ function AdsPage() {
           throw new Error('Failed to fetch ads');
         }
         const data = await response.json();
-        console.log(data.images);
         setAds(data); // Update ads state with fetched data
       } catch (error) {
         console.error('Error fetching ads:', error.message);
@@ -41,16 +40,20 @@ function AdsPage() {
       <h1 className="text-3xl font-semibold mb-8">Ads Page</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {currentAds.map((ad) => (
-          <div key={ad.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
-            <img src={ad.images[0].url} alt={ad.title} className="w-full h-48 object-cover object-center" />
+          <div key={ad.ad_id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+            {ad.images.length > 0 ? (
+              <img src={`${ad.images[0].url}`} alt={ad.title} className="w-full h-48 object-cover object-center" />
+            ) : (
+              <p>No Image Available</p>
+            )}
             <div className="p-4">
               <h2 className="text-lg font-semibold mb-2">{ad.title}</h2>
               <p className="text-gray-600 mb-2">{ad.description}</p>
               <p className="text-gray-800 font-semibold mb-2">{ad.price}</p>
               <p className="text-gray-600 mb-2">{ad.condition} - {ad.category}</p>
-              <Link to={`/termekek/${ad.id}`}>
+              <Link to={`/termekek/${ad.ad_id}`}>
                 <button
-                  onClick={() => viewAdDetails(ad.id)}
+                  onClick={() => viewAdDetails(ad.ad_id)}
                   className="block w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
                 >
                   View Details
