@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, status
-from sqlalchemy import delete
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
@@ -44,3 +44,19 @@ async def reset_current_user_password(
     current_user.hashed_password = get_password_hash(user_update_password.password)
     session.add(current_user)
     await session.commit()
+
+
+@router.get(
+    "/user/{user_id}",
+    response_model=UserResponse,
+    description="Get user information based on user id.",
+)
+async def get_user(
+    user_id: str,
+    session: AsyncSession = Depends(deps.get_session),
+) -> UserResponse:
+    result = await session.execute(select(User).filter_by(user_id=user_id))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserResponse.model_validate(user)

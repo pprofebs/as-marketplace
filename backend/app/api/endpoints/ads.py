@@ -1,16 +1,33 @@
+import logging
+import os
 from typing import Any
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    status,
+)
+from fastapi.responses import FileResponse
 from sqlalchemy import desc, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import api_messages, deps
 from app.models import Ad, ImageUrl, User
-from app.schemas.requests import AdCreateRequest
 from app.schemas.responses import AdResponse
 
 router = APIRouter()
+
+logging.basicConfig(level=logging.DEBUG)
+
+UPLOAD_DIRECTORY = "uploads"
+os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 AD_RESPONSES: dict[int | str, dict[str, Any]] = {
     403: {
@@ -49,42 +66,93 @@ AD_RESPONSES: dict[int | str, dict[str, Any]] = {
     description="Creates a new ad. Only for logged in users.",
 )
 async def create_new_ad(
-    data: AdCreateRequest,
+    title: str = Form(...),
+    description: str = Form(...),
+    price: float = Form(...),
+    category: str = Form(...),
+    condition: str = Form(...),
+    images: list[UploadFile] = File(...),
     session: AsyncSession = Depends(deps.get_session),
     current_user: User = Depends(deps.get_current_user),
 ) -> Ad:
     ad = await session.scalar(
-        select(Ad)
-        .where(Ad.title == data.title)
-        .where(Ad.user_id == current_user.user_id)
+        select(Ad).where(Ad.title == title).where(Ad.user_id == current_user.user_id)
     )
 
     if ad is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=api_messages.AD_TITLE_ALREADY_USED,
+            detail="Ad title already used",
         )
 
     new_ad = Ad(
-        title=data.title,
-        description=data.description,
-        price=data.price,
-        category=data.category,
-        condition=data.condition,
+        title=title,
+        description=description,
+        price=price,
+        category=category,
+        condition=condition,
         user_id=current_user.user_id,
     )
 
-    image_urls = [ImageUrl(url=url, ad=new_ad) for url in data.images]
-
     session.add(new_ad)
+    await session.commit()
+    await session.refresh(new_ad)
+
+    image_urls = []
+    for image in images:
+        file_extension = image.filename.split(".")[-1]
+        unique_filename = f"{uuid4()}.{file_extension}"
+        file_path = os.path.join(UPLOAD_DIRECTORY, unique_filename)
+
+        # Save the uploaded file
+        with open(file_path, "wb") as buffer:
+            buffer.write(image.file.read())
+
+        image_url = unique_filename
+        image_urls.append(ImageUrl(url=image_url, ad_id=new_ad.ad_id))
+
     session.add_all(image_urls)
 
     try:
         await session.commit()
     except IntegrityError:
         await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error saving ad and images",
+        )
 
     return new_ad
+
+
+@router.get("/ad/{ad_id}", response_model=AdResponse, status_code=status.HTTP_200_OK)
+async def get_ad(
+    ad_id: str,
+    request: Request,
+    session: AsyncSession = Depends(deps.get_session),
+) -> AdResponse:
+    result = await session.execute(select(Ad).filter_by(ad_id=ad_id))
+    ad = result.scalar_one_or_none()
+
+    if ad is None:
+        raise HTTPException(status_code=404, detail="Ad not found")
+
+    # base_url = str(request.url_for("uploads", path="")).rstrip("/uploads")
+    base_url = str(request.base_url).rstrip("/")
+    image_urls = [{"url": f"{base_url}/images/{img.url}"} for img in ad.images]
+
+    ad_response = AdResponse(
+        ad_id=ad.ad_id,
+        title=ad.title,
+        price=ad.price,
+        description=ad.description,
+        user_id=ad.user_id,
+        images=image_urls,
+        category=ad.category,
+        condition=ad.condition,
+    )
+
+    return ad_response
 
 
 @router.put(
@@ -96,7 +164,12 @@ async def create_new_ad(
 )
 async def update_ad(
     ad_id: str,
-    data: AdCreateRequest,
+    title: str = Form(...),
+    description: str = Form(...),
+    price: float = Form(...),
+    category: str = Form(...),
+    condition: str = Form(...),
+    images: list[UploadFile] = File(None),  # Optional: User may not upload new images
     session: AsyncSession = Depends(deps.get_session),
     current_user: User = Depends(deps.get_current_user),
 ) -> Ad:
@@ -104,18 +177,50 @@ async def update_ad(
     if not ad:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=api_messages.AD_NOT_FOUND,
+            detail="Ad not found",
         )
     if ad.user_id != current_user.user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=api_messages.AD_UNATHORIZED,
+            detail="Not authorized to update this ad",
         )
-    ad.title = data.title
-    ad.description = data.description
-    ad.price = data.price
 
-    await session.commit()
+    ad.title = title
+    ad.description = description
+    ad.price = price
+    ad.category = category
+    ad.condition = condition
+
+    # Handle image uploads
+    if images:
+        # Optional: Delete old images if necessary
+        # await session.execute(delete(ImageUrl).where(ImageUrl.ad_id == ad_id))
+
+        image_urls = []
+        for image in images:
+            file_extension = image.filename.split(".")[-1]
+            unique_filename = f"{uuid4()}.{file_extension}"
+            file_path = os.path.join(UPLOAD_DIRECTORY, unique_filename)
+
+            # Save the uploaded file
+            with open(file_path, "wb") as buffer:
+                buffer.write(image.file.read())
+
+            image_url = unique_filename
+            image_urls.append(ImageUrl(url=image_url, ad_id=ad.ad_id))
+
+        session.add_all(image_urls)
+
+    try:
+        await session.commit()
+        await session.refresh(ad)
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error updating ad and images",
+        )
+
     return ad
 
 
@@ -159,6 +264,14 @@ async def get_all_my_ads(
     return list(ads.all())
 
 
+@router.get("/images/{image_filename}")
+async def get_image(image_filename: str):
+    file_path = os.path.join(UPLOAD_DIRECTORY, image_filename)
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    raise HTTPException(status_code=404, detail="Image not found")
+
+
 @router.get(
     "/all",
     response_model=list[AdResponse],
@@ -166,15 +279,22 @@ async def get_all_my_ads(
     description="Get all ads sorted by their last updated time.",
 )
 async def get_all_ads(
+    request: Request,  # Add request to get the base URL
     session: AsyncSession = Depends(deps.get_session),
 ) -> list[AdResponse]:
     ads = await session.execute(select(Ad).order_by(desc(Ad.update_time)))
     ad_responses = []
+
+    # Construct the base URL for the images
+    base_url = str(request.base_url).rstrip("/")
+
     for ad in ads.scalars():
-        image_urls = [{"url": img.url} for img in ad.images]
+        image_urls = [{"url": f"{base_url}/images/{img.url}"} for img in ad.images]
+
         ad_response = AdResponse(
             ad_id=ad.ad_id,
             title=ad.title,
+            price=ad.price,
             description=ad.description,
             user_id=ad.user_id,
             images=image_urls,

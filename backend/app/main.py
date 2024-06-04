@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.api_router import ad_router, api_router, auth_router
 from app.core.config import get_settings
+
+UPLOAD_DIRECTORY = "uploads"
 
 app = FastAPI(
     title="minimal fastapi postgres template",
@@ -20,11 +23,7 @@ app.include_router(ad_router)
 # Sets all CORS enabled origins
 app.add_middleware(
     CORSMiddleware,
-    # TODO: Figure out why getting this from the settings is not working
-    # allow_origins=[
-    #    str(origin) for origin in get_settings().security.backend_cors_origins
-    # ],
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,3 +34,6 @@ app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=get_settings().security.allowed_hosts,
 )
+
+# Serve images from the 'uploads' directory
+app.mount("/images", StaticFiles(directory=UPLOAD_DIRECTORY), name="uploads")

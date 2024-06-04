@@ -26,7 +26,9 @@ class AdResponse(BaseResponse):
     ad_id: str
     title: str
     description: str
+    price: int
     user_id: str
     images: list[ImageUrl]
     category: str
     condition: str
+    user_id: str
