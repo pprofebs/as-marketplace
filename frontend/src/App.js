@@ -9,6 +9,7 @@ import SignupPage from "./pages/SignUp";
 import ProductDetail from "./pages/ProductDetail";
 import RegistrationSuccessPage from "./pages/RegistrationSuccess";
 import { UserProvider } from './context/UserContext';
+import UserProfile from "./pages/UserProfile";
 
 
 export default function App() {
@@ -41,6 +42,10 @@ export default function App() {
           path: "/termekek/:id",
           element: <ProductDetail />
         },
+        {
+          path: "/en",
+          element: <UserProfile />
+        },
      ]
     }
   ]);
@@ -58,6 +63,7 @@ function Root() {
         <Route path="/termekek" element={<AdsPage/>} />
         <Route path="/termekek/:adId" element={<ProductDetail/>} />
         <Route path="/belepes" element={<LoginPage/>} />
+        <Route path="/en" element={<UserProfile/>} />
         <Route path="/regisztracio" element={<SignupPage/>} />
         <Route path="/sikeres-regisztracio" element={<RegistrationSuccessPage/>} />
       </Route>
