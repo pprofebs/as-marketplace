@@ -37,14 +37,14 @@ function AdsPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-semibold mb-8">Ads Page</h1>
+      <h1 className="text-3xl font-semibold mb-8">Hirdetések</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {currentAds.map((ad) => (
           <div key={ad.ad_id} className="bg-white shadow-lg rounded-lg overflow-hidden">
             {ad.images.length > 0 ? (
               <img src={`${ad.images[0].url}`} alt={ad.title} className="w-full h-48 object-cover object-center" />
             ) : (
-              <p>No Image Available</p>
+              <p>Nincs elérhető kép</p>
             )}
             <div className="p-4">
               <h2 className="text-lg font-semibold mb-2">{ad.title}</h2>
@@ -56,7 +56,7 @@ function AdsPage() {
                   onClick={() => viewAdDetails(ad.ad_id)}
                   className="block w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
                 >
-                  View Details
+                  Részletek
                 </button>
               </Link>
             </div>
@@ -70,15 +70,15 @@ function AdsPage() {
           disabled={currentPage === 1}
           className="bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-2 px-4 rounded-l focus:outline-none focus:shadow-outline"
         >
-          Previous
+          Előző oldal
         </button>
-        <span className="bg-gray-200 text-gray-600 py-2 px-4">{`Page ${currentPage}`}</span>
+        <span className="bg-gray-200 text-gray-600 py-2 px-4">{`${currentPage}`}</span>
         <button
           onClick={() => paginate(currentPage + 1)}
           disabled={currentAds.length < adsPerPage}
           className="bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline"
         >
-          Next
+          Következő oldal
         </button>
       </div>
     </div>

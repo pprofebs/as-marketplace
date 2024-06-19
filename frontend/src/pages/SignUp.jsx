@@ -7,9 +7,11 @@ const SignupPage = () => {
     password: '',
     confirmPassword: '',
     fullName: '',
+    phoneNumber: '',
+    location: ''
   });
   const [errors, setErrors] = useState({});
-  const [isRegistered, setIsRegistered] = useState(false); // State to track registration status
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,7 +21,6 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Form validation
     const newErrors = {};
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -33,9 +34,14 @@ const SignupPage = () => {
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full Name is required';
     }
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+    }
+    if (!formData.location.trim()) {
+      newErrors.location = 'Location is required';
+    }
     setErrors(newErrors);
 
-    // If no errors, submit the form
     if (Object.keys(newErrors).length === 0) {
       try {
         const response = await fetch('http://127.0.0.1:8000/auth/register', {
@@ -46,27 +52,26 @@ const SignupPage = () => {
           body: JSON.stringify({
             email: formData.email,
             password: formData.password,
-            full_name: formData.fullName
+            full_name: formData.fullName,
+            phone_number: formData.phoneNumber,
+            location: formData.location
           })
         });
 
         if (response.ok) {
           const data = await response.json();
           console.log('User registered:', data);
-          setIsRegistered(true); // Set isRegistered to true on successful registration
+          setIsRegistered(true);
         } else {
           const errorData = await response.json();
           console.error('Registration failed:', errorData.detail);
-          // Handle error (e.g., display error message)
         }
       } catch (error) {
         console.error('Registration error:', error);
-        // Handle network error or other exceptions
       }
     }
   };
 
-  // Redirect to success page if registration is successful
   if (isRegistered) {
     return <Navigate to="/sikeres-regisztracio" replace />;
   }
@@ -74,7 +79,7 @@ const SignupPage = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex justify-center items-center">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-3xl font-semibold text-center mb-6">Sign Up</h2>
+        <h2 className="text-3xl font-semibold text-center mb-6">Regisztráció</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Input */}
           <div>
@@ -90,7 +95,7 @@ const SignupPage = () => {
           </div>
           {/* Name Input */}
           <div>
-            <label className="block text-sm font-medium mb-1">Full Name</label>
+            <label className="block text-sm font-medium mb-1">Teljes név</label>
             <input
               type="text"
               name="fullName"
@@ -100,9 +105,33 @@ const SignupPage = () => {
             />
             {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>}
           </div>
+          {/* Phone Number Input */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Telefonszám</label>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className={`w-full border rounded-md py-2 px-3 focus:outline-none ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+            />
+            {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
+          </div>
+          {/* Location Input */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Helyszín</label>
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className={`w-full border rounded-md py-2 px-3 focus:outline-none ${errors.location ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+            />
+            {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+          </div>
           {/* Password Input */}
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
+            <label className="block text-sm font-medium mb-1">Jelszó</label>
             <input
               type="password"
               name="password"
@@ -114,7 +143,7 @@ const SignupPage = () => {
           </div>
           {/* Confirm Password Input */}
           <div>
-            <label className="block text-sm font-medium mb-1">Confirm Password</label>
+            <label className="block text-sm font-medium mb-1">Jelszó megerősítése</label>
             <input
               type="password"
               name="confirmPassword"
@@ -129,14 +158,14 @@ const SignupPage = () => {
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
           >
-            Sign Up
+            Regisztráció
           </button>
         </form>
         {/* Link to Login */}
         <p className="text-sm text-gray-600 mt-4 text-center">
-          Already have an account?{' '}
+          Már van fiókod?{' '}
           <Link to="/login" className="text-blue-500 hover:text-blue-600">
-            Log In
+            Bejelentkezés
           </Link>
         </p>
       </div>

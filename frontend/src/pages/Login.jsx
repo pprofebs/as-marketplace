@@ -71,7 +71,7 @@ const LoginPage = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex justify-center items-center">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-3xl font-semibold text-center mb-6">Sign In</h2>
+        <h2 className="text-3xl font-semibold text-center mb-6">Bejelentkezés</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Input */}
           <div>
@@ -93,7 +93,7 @@ const LoginPage = () => {
           {/* Password Input */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-1">
-              Password
+              Jelszó
             </label>
             <input
               type="password"
@@ -117,16 +117,16 @@ const LoginPage = () => {
         </form>
         {/* Link to Sign Up */}
         <p className="text-sm text-gray-600 mt-4 text-center">
-          Don't have an account?{' '}
+          Még nem regisztráltál?{' '}
           <Link to="/signup" className="text-blue-500 hover:text-blue-600">
-            Sign Up
+            Regisztráció
           </Link>
         </p>
         {/* Link to Forgot Password */}
         <p className="text-sm text-gray-600 mt-2 text-center">
-          Forgot your password?{' '}
+          Elfelejtetted a jelszavad?{' '}
           <Link to="/forgot-password" className="text-blue-500 hover:text-blue-600">
-            Reset password
+            Kérj új jelszót
           </Link>
         </p>
       </div>

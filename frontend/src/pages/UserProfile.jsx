@@ -55,38 +55,39 @@ function UserProfile() {
     if (!editAd) return;
 
     try {
-      const formData = new FormData();
-      formData.append('title', editAd.title);
-      formData.append('description', editAd.description);
-      formData.append('price', editAd.price);
-      formData.append('category', editAd.category);
-      formData.append('condition', editAd.condition);
-      if (editAd.images) {
-        for (let i = 0; i < editAd.images.length; i++) {
-          formData.append('images', editAd.images[i]);
+        const formData = new FormData();
+        formData.append('title', editAd.title);
+        formData.append('description', editAd.description);
+        formData.append('price', editAd.price);
+        formData.append('category', editAd.category);
+        formData.append('condition', editAd.condition);
+
+        if (editAd.images && editAd.images.length > 0) {
+            for (let i = 0; i < editAd.images.length; i++) {
+                formData.append('images', editAd.images[i]);
+            }
         }
-      }
-      console.log(formData);
 
-      await axios.put(`http://localhost:8000/ads/${editAd.ad_id}/update`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+       console.log(formData);
 
-      setEditAd(null);
-      // Refresh ads list
-      const response = await axios.get('http://localhost:8000/ads/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setAds(response.data.ads || []);
+        await axios.put(`http://localhost:8000/ads/${editAd.ad_id}/update`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        setEditAd(null);
+        const response = await axios.get('http://localhost:8000/ads/me', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        setAds(response.data || []);
     } catch (err) {
-      console.error('Error updating ad', err);
+        console.error('Error updating ad', err);
     }
-  };
+};
 
   const handleDeleteAd = async (adId) => {
     try {
@@ -109,7 +110,7 @@ function UserProfile() {
 
   const handleFileChange = (event) => {
     const files = event.target.files;
-    setEditAd({ ...editAd, images: files });
+    setEditAd({ ...editAd, images: files.length > 0 ? files : null });
   };
 
   const handleViewAd = (adId) => {
@@ -118,14 +119,14 @@ function UserProfile() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-semibold mb-4">User Profile</h1>
+      <h1 className="text-3xl font-semibold mb-4">Profilom</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">User Information</h2>
+          <h2 className="text-xl font-semibold mb-4">Felhasználói információ</h2>
           {user && (
             <div>
               <div className="mb-4">
-                <label className="block text-gray-700">Username</label>
+                <label className="block text-gray-700">Felhasználónév</label>
                 <input
                   type="text"
                   value={user.username}
@@ -143,7 +144,7 @@ function UserProfile() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Location</label>
+                <label className="block text-gray-700">Város</label>
                 <input
                   type="text"
                   value={user.location}
@@ -161,9 +162,9 @@ function UserProfile() {
           )}
         </div>
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Statistics</h2>
+          <h2 className="text-xl font-semibold mb-4">Statisztikáim</h2>
           <div className="mb-4">
-            <p className="text-gray-700">Total Ads: {stats.totalAds}</p>
+            <p className="text-gray-700">Összes hirdetésem: {stats.totalAds}</p>
             <p className="text-gray-700">Total Views: {stats.totalViews}</p>
             <p className="text-gray-700">Total Clicks: {stats.totalClicks}</p>
           </div>
@@ -171,7 +172,7 @@ function UserProfile() {
       </div>
       {ads.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Your Ads</h2>
+          <h2 className="text-xl font-semibold mb-4">Hirdetéseim</h2>
           <div className="grid grid-cols-1 gap-4">
             {ads.map((ad) => (
               <div key={ad.ad_id} className="flex justify-between items-center p-4 border border-gray-300 rounded">
@@ -184,19 +185,19 @@ function UserProfile() {
                     onClick={() => handleViewAd(ad.ad_id)}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
-                    View
+                    Megjelenítés
                   </button>
                   <button
                     onClick={() => handleUpdateAd(ad)}
                     className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                   >
-                    Edit
+                    Szerkesztés
                   </button>
                   <button
                     onClick={() => handleDeleteAd(ad.ad_id)}
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                   >
-                    Delete
+                    Törlés
                   </button>
                 </div>
               </div>

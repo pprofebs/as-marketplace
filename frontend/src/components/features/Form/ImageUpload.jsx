@@ -5,23 +5,30 @@ const ImageUpload = ({ handleFileChange, imagePreviews, ImageHandleFileChange, h
 
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Upload Images (max {maxImages})
-      </label>
+      <div className="mb-8">
       <input
         type="file"
-        name="images"
-        id="images"
-        className="block w-full text-sm text-gray-500
-                   file:mr-4 file:py-2 file:px-4
-                   file:rounded-full file:border-0
-                   file:text-sm file:font-semibold
-                   file:bg-blue-50 file:text-blue-700
-                   hover:file:bg-blue-100"
+        name="file"
+        id="file"
+        className="sr-only"
         onChange={handleFileChange}
         multiple
-        disabled={imagePreviews.length >= maxImages}
+        accept="image/*"
       />
+      <label
+        htmlFor="file"
+        className="relative flex min-h-[200px] items-center justify-center rounded-md border border-dashed border-[#e0e0e0] p-12 text-center cursor-pointer"
+      >
+        <div>
+          <span className="mb-2 block text-xl font-semibold text-[#07074D]">
+            Tölts fel képeket a termékről
+          </span>
+          <span className="inline-flex rounded border border-[#e0e0e0] py-2 px-7 text-base font-medium text-[#07074D]">
+            Tallózás..
+          </span>
+        </div>
+      </label>
+      </div>
       <div className="flex flex-wrap mt-4 -mx-2">
         {imagePreviews.map((preview, index) => (
           <div key={index} className="w-1/3 px-2 mb-4 relative">
@@ -37,7 +44,7 @@ const ImageUpload = ({ handleFileChange, imagePreviews, ImageHandleFileChange, h
         ))}
       </div>
       <p className="text-xs text-gray-500 mt-2">
-        You can upload a maximum of {maxImages} images. Maximum file size: 5MB each.
+        Csak {maxImages} darab képet lehet feltölteni. A maximum képméret: 5MB darabonként.
       </p>
     </div>
   );

@@ -5,11 +5,11 @@ const ReasonCard = ({ name, description }) => {
   // Define icon component based on name prop
   const getIcon = () => {
     switch (name) {
-      case 'Secure Transactions':
+      case 'Ellenőrzött hirdetések':
         return <FaLock className="text-5xl text-gray-600 mb-4" />;
-      case 'Quality Products':
+      case 'Kiváló termékek':
         return <FaThumbsUp className="text-5xl text-gray-600 mb-4" />;
-      case 'Exceptional Service':
+      case 'A közösség tagjaitól':
         return <FaUsers className="text-5xl text-gray-600 mb-4" />;
       default:
         return null;

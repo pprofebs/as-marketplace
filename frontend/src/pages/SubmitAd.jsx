@@ -100,27 +100,27 @@ const SubmitAd = () => {
       ) : (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
           <div className="max-w-xl w-full bg-white p-8 rounded-lg shadow-md">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Submit Your Airsoft Replica Ad</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Készítsd el a hirdetésed</h2>
 
             <form className="space-y-6" onSubmit={handleSubmit} encType="multipart/form-data" method="post">
               {/* Personal Details */}
               <div>
-                <p className="text-lg font-semibold text-gray-700 mb-2">Personal Details</p>
+                <p className="text-lg font-semibold text-gray-700 mb-2">Személyes Adatok</p>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <GenericInput type="text" name="phone" id="phone" placeholder="Phone Number" handleChange={handleChange} />
-                  <GenericInput type="text" name="location" id="location" placeholder="Location (City, Country)" handleChange={handleChange} />
+                  <GenericInput type="text" name="phone" id="phone" placeholder="Telefonszám" handleChange={handleChange} />
+                  <GenericInput type="text" name="location" id="location" placeholder="Város (Város, Ország)" handleChange={handleChange} />
                 </div>
               </div>
 
               {/* Airsoft Replica Details */}
               <div>
-                <p className="text-lg font-semibold text-gray-700 mb-2">Airsoft Replica Details</p>
+                <p className="text-lg font-semibold text-gray-700 mb-2">Hirdetés részletei</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <GenericInput type="text" name="title" id="title" placeholder="Ad Title" handleChange={handleChange} />
-                  <DescriptionTextarea name="description" id="description" placeholder="Description" handleChange={handleChange} value={formData.description} />
-                  <GenericInput type="text" name="price" id="price" placeholder="Price" handleChange={handleChange} />
-                  <GenericSelect name="condition" id="condition" options={conditionOptions} placeholder="Select Condition" handleChange={handleChange} />
-                  <GenericSelect name="category" id="category" options={categoryOptions} placeholder="Select Category" handleChange={handleChange} />
+                  <GenericInput type="text" name="title" id="title" placeholder="A hirdetésed cime" handleChange={handleChange} />
+                  <DescriptionTextarea name="description" id="description" placeholder="Leirás" handleChange={handleChange} value={formData.description} />
+                  <GenericInput type="text" name="price" id="price" placeholder="Ár" handleChange={handleChange} />
+                  <GenericSelect name="condition" id="condition" options={conditionOptions} placeholder="Válassz kondiciót" handleChange={handleChange} />
+                  <GenericSelect name="category" id="category" options={categoryOptions} placeholder="Válassz kategóriát" handleChange={handleChange} />
                 </div>
                 <div>
                   <ImageUpload handleFileChange={handleFileChange} imagePreviews={imagePreviews} handleFileRemove={handleFileRemove} />
@@ -133,7 +133,7 @@ const SubmitAd = () => {
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full"
                 >
-                  Submit
+                  Küldés
                 </button>
               </div>
             </form>
