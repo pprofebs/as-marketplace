@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ImageUpload = ({ handleFileChange, imagePreviews, ImageHandleFileChange, handleFileRemove }) => {
+const ImageUpload = ({ handleFileChange, imagePreviews, handleFileRemove }) => {
   const maxImages = 5;
 
   return (

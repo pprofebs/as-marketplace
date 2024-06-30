@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import ImageModal from '../components/features/Modal/ImageModal';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import ImageModal from "../components/features/Modal/ImageModal";
+import DOMPurify from 'dompurify'; // Import DOMPurify for sanitizing HTML content
 
 function ProductDetail() {
   const { adId } = useParams(); // Get ad ID from route parameters
@@ -16,12 +17,16 @@ function ProductDetail() {
     // Fetch ad data from backend
     const fetchAd = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/ads/ad/${adId}`);
+        const response = await axios.get(
+          `http://localhost:8000/ads/ad/${adId}`
+        );
         const adData = response.data;
         setAd(adData);
 
         // Fetch user data based on user_id from ad data
-        const userResponse = await axios.get(`http://localhost:8000/users/user/${adData.user_id}`);
+        const userResponse = await axios.get(
+          `http://localhost:8000/users/user/${adData.user_id}`
+        );
         console.log(userResponse);
         setUser(userResponse.data);
       } catch (err) {
@@ -56,6 +61,22 @@ function ProductDetail() {
     );
   };
 
+  const conditionOptions = [
+    { label: "Új", value: "new" },
+    { label: "Nagyon jó", value: "very_good" },
+    { label: "Jó", value: "good" },
+    { label: "Elfogadható", value: "fair" },
+    {
+      label: "Alkatrészeknek vagy nem működő",
+      value: "for_parts_or_not_working",
+    },
+  ];
+
+  const getConditionLabel = (value) => {
+    const condition = conditionOptions.find((option) => option.value === value);
+    return condition ? condition.label : "Ismeretlen";
+  };
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-semibold mb-4">{ad.title}</h1>
@@ -66,7 +87,7 @@ function ProductDetail() {
               src={image.url}
               alt={ad.title}
               className="object-cover rounded-lg shadow-md cursor-pointer"
-              style={{ width: '400px', height: '400px' }}
+              style={{ width: "400px", height: "400px" }}
               onClick={() => openModal(index)}
             />
           </div>
@@ -74,10 +95,15 @@ function ProductDetail() {
       </div>
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Leirás</h2>
-        <p className="text-gray-700 mb-4">{ad.description}</p>
+        <div
+          className="text-gray-700 mb-4"
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ad.description) }}
+        />
         <div className="flex justify-between items-center mb-4">
           <p className="text-gray-800 font-semibold">HUF {ad.price}</p>
-          <p className="text-gray-700">Termék állapota: {ad.condition} - Kategória: {ad.category}</p>
+          <p className="text-gray-700">
+            Termék állapota: {getConditionLabel(ad.condition)} - Kategória: {ad.category}
+          </p>
         </div>
         <div className="border-t border-gray-300 pt-4">
           {user && (
@@ -92,8 +118,10 @@ function ProductDetail() {
             </div>
           )}
           <div>
-            <p className="text-gray-800 font-semibold mb-2">Shipping Information</p>
-            <p className="text-gray-600">Shipping options and details...</p>
+            <p className="text-gray-800 font-semibold mb-2">
+              Szállítási Információ
+            </p>
+            <p className="text-gray-600">Hely: {user.location}, Magyarország</p>
           </div>
         </div>
       </div>

@@ -1,16 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Import the styles
 
-const DescriptionTextarea = ({ name, id, placeholder, handleChange, value }) => {
+const DescriptionTextarea = ({ name, id, placeholder, value, handleChange }) => {
+  // State to manage the editor content
+  const [editorHtml, setEditorHtml] = useState(value);
+
+  // Function to handle editor changes
+  const handleEditorChange = (html) => {
+    setEditorHtml(html);
+    handleChange(html); // Propagate the HTML content to parent component
+  };
+
   return (
-    <textarea
-      name={name}
-      id={id}
-      rows="6"
-      placeholder={placeholder}
-      className="input-field resize-none col-span-2 w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-      onChange={handleChange}
-      value={value}
-    ></textarea>
+    <div className="col-span-2 w-full">
+      <ReactQuill
+        name={name}
+        id={id}
+        placeholder={placeholder}
+        value={editorHtml}
+        onChange={handleEditorChange}
+        modules={{
+          toolbar: [
+            [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['bold', 'italic', 'underline'],
+            ['clean']
+          ],
+        }}
+        formats={[
+          'header', 'font',
+          'list', 'bullet',
+          'bold', 'italic', 'underline',
+        ]}
+      />
+    </div>
   );
 };
 

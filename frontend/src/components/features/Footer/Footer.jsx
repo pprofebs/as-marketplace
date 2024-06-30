@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const FooterItem = ({ name, to }) => {
   return (
     <div className="px-5 py-2">
-      <Link to={to} className="text-base leading-6 text-white hover:text-gray-900">
+      <Link to={to} className="text-base leading-6 text-white hover:text-blue-900">
         {name}
       </Link>
     </div>
@@ -20,7 +20,7 @@ const Footer = () => {
           <FooterItem name={'Termékek'} to={'/termekek'} />
         </nav>
         <div className="flex justify-center mt-8 space-x-6">
-          <a href="#" className="text-white hover:text-gray-500">
+          <a href="#" className="text-white hover:text-blue-500">
             <span className="sr-only">Facebook</span>
             <svg
               className="w-6 h-6"
@@ -31,7 +31,7 @@ const Footer = () => {
               <path d="M22.675 0H1.325C.594 0 0 .594 0 1.326v21.348C0 23.406.594 24 1.325 24H12.81v-9.293H9.692v-3.622h3.118V8.41c0-3.097 1.891-4.785 4.65-4.785 1.323 0 2.46.099 2.791.143v3.24l-1.915.001c-1.5 0-1.792.715-1.792 1.762v2.31h3.584l-.467 3.622h-3.117V24h6.112c.73 0 1.324-.594 1.324-1.326V1.326C24 .594 23.406 0 22.675 0z" />
             </svg>
           </a>
-          <a href="#" className="text-white hover:text-gray-500">
+          <a href="#" className="text-white hover:text-pink-500">
             <span className="sr-only">Instagram</span>
             <svg
               className="w-6 h-6"
