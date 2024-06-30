@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import delete, select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
 from app.core.security.password import get_password_hash
 from app.models import User
-from app.schemas.requests import UserUpdatePasswordRequest
+from app.schemas.requests import UserUpdatePasswordRequest, UserUpdateRequest
 from app.schemas.responses import UserResponse
 
 router = APIRouter()
@@ -29,6 +30,39 @@ async def delete_current_user(
 ) -> None:
     await session.execute(delete(User).where(User.user_id == current_user.user_id))
     await session.commit()
+
+
+@router.put(
+    "/me", status_code=status.HTTP_200_OK, description="Update current user information"
+)
+async def update_current_user(
+    update_request: UserUpdateRequest,
+    current_user: User = Depends(deps.get_current_user),
+    session: AsyncSession = Depends(deps.get_session),
+) -> None:
+    try:
+        stmt = select(User).where(User.user_id == current_user.user_id)
+        result = await session.execute(stmt)
+        user = result.scalar_one()
+
+        # Update user information with values from the update_request
+        user.full_name = user.full_name
+        user.email = user.email
+        user.phone_number = update_request.phone_number
+        user.location = update_request.location
+
+        await session.commit()
+    except NoResultFound:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    except Exception:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        )
 
 
 @router.post(

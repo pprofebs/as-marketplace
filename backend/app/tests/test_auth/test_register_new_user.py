@@ -1,3 +1,5 @@
+import secrets
+
 from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy import func, select
@@ -65,3 +67,24 @@ async def test_register_new_user_cannot_create_already_created_user(
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json() == {"detail": api_messages.EMAIL_ADDRESS_ALREADY_USED}
+
+
+async def test_new_user_email_confirmation(
+    client: AsyncClient,
+    session: AsyncSession,
+) -> None:
+    token = secrets.token_urlsafe(32)
+    user = User(
+        email="test@email.com",
+        hashed_password="bla",
+        full_name="test edward",
+        is_customer=False,
+        is_active=False,
+        confirmation_token=token,
+    )
+    session.add(user)
+    await session.commit()
+
+    response = await client.get(
+        app.url_path_for("confirm_email", token=token),
+    )

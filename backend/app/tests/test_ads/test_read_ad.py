@@ -63,9 +63,15 @@ async def test_get_all_ads_return_all_ads(
         app.url_path_for("create_new_ad"),
         headers=second_user_headers,
         json={
-            "title": "test weapon",
-            "description": "This is another test",
+            "title": "another test weapon",
+            "description": "This is the weapons description",
             "price": 1200,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
 
@@ -76,11 +82,23 @@ async def test_get_all_ads_return_all_ads(
             "title": "test weapon",
             "description": "This is the weapons description",
             "user_id": default_user.user_id,
+            "images": [
+                {"url": "http://www.test-image.co/1234.jpg"},
+                {"url": "http://www.test-image.co/1234.jpg"},
+            ],
+            "category": "weapon",
+            "condition": "mint",
         },
         {
             "ad_id": ad_response.json()["ad_id"],
-            "title": "test weapon",
-            "description": "This is another test",
+            "title": "another test weapon",
+            "description": "This is the weapons description",
             "user_id": second_user.user_id,
+            "images": [
+                {"url": "http://www.test-image.co/1234.jpg"},
+                {"url": "http://www.test-image.co/1234.jpg"},
+            ],
+            "category": "weapon",
+            "condition": "mint",
         },
     ]

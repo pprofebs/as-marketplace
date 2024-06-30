@@ -9,6 +9,7 @@ from fastapi import (
     File,
     Form,
     HTTPException,
+    Query,
     Request,
     UploadFile,
     status,
@@ -17,6 +18,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import desc, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.api import api_messages, deps
 from app.models import Ad, ImageUrl, User
@@ -69,7 +71,8 @@ async def create_new_ad(
     title: str = Form(...),
     description: str = Form(...),
     price: float = Form(...),
-    category: str = Form(...),
+    mainCategory: str = Form(...),
+    subCategory: str = Form(...),
     condition: str = Form(...),
     images: list[UploadFile] = File(...),
     session: AsyncSession = Depends(deps.get_session),
@@ -89,7 +92,8 @@ async def create_new_ad(
         title=title,
         description=description,
         price=price,
-        category=category,
+        category=mainCategory,
+        sub_category=subCategory,
         condition=condition,
         user_id=current_user.user_id,
     )
@@ -169,7 +173,7 @@ async def update_ad(
     price: float = Form(...),
     category: str = Form(...),
     condition: str = Form(...),
-    images: list[UploadFile] = File(None),  # Optional: User may not upload new images
+    images: list[UploadFile] | None = File(None),
     session: AsyncSession = Depends(deps.get_session),
     current_user: User = Depends(deps.get_current_user),
 ) -> Ad:
@@ -191,18 +195,13 @@ async def update_ad(
     ad.category = category
     ad.condition = condition
 
-    # Handle image uploads
     if images:
-        # Optional: Delete old images if necessary
-        # await session.execute(delete(ImageUrl).where(ImageUrl.ad_id == ad_id))
-
         image_urls = []
         for image in images:
             file_extension = image.filename.split(".")[-1]
             unique_filename = f"{uuid4()}.{file_extension}"
             file_path = os.path.join(UPLOAD_DIRECTORY, unique_filename)
 
-            # Save the uploaded file
             with open(file_path, "wb") as buffer:
                 buffer.write(image.file.read())
 
@@ -236,16 +235,29 @@ async def delete_ad(
 ) -> None:
     ad = await session.get(Ad, ad_id)
     if not ad:
+        logging.error(f"Ad with id {ad_id} not found")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=api_messages.AD_NOT_FOUND
+            status_code=status.HTTP_404_NOT_FOUND, detail="Ad not found"
         )
     if ad.user_id != current_user.user_id:
+        logging.error(
+            f"User {current_user.user_id} is not authorized to delete ad {ad_id}"
+        )
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=api_messages.AD_UNATHORIZED
+            status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized to delete ad"
         )
 
-    session.delete(ad)
-    await session.commit()
+    await session.delete(ad)
+    try:
+        await session.commit()
+        logging.info(f"Ad with id {ad_id} successfully deleted")
+    except Exception as e:
+        logging.error(f"Error committing delete transaction for ad {ad_id}: {e}")
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to delete ad",
+        )
 
 
 @router.get(
@@ -279,13 +291,37 @@ async def get_image(image_filename: str):
     description="Get all ads sorted by their last updated time.",
 )
 async def get_all_ads(
-    request: Request,  # Add request to get the base URL
+    request: Request,
     session: AsyncSession = Depends(deps.get_session),
+    limit: int | None = Query(None, description="Limit the number of ads returned"),
+    search: str | None = Query(
+        None, description="Search query for title, description, and category"
+    ),
+    condition: str | None = Query(None, description="Filter by condition"),
+    category: str | None = Query(None, description="Filter by category"),
 ) -> list[AdResponse]:
-    ads = await session.execute(select(Ad).order_by(desc(Ad.update_time)))
+    query = select(Ad).options(selectinload(Ad.images)).order_by(desc(Ad.update_time))
+
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            (Ad.title.ilike(search_term))
+            | (Ad.description.ilike(search_term))
+            | (Ad.category.ilike(search_term))
+        )
+
+    if condition:
+        query = query.filter(Ad.condition == condition)
+
+    if category:
+        query = query.filter(Ad.category == category)
+
+    if limit:
+        query = query.limit(limit)
+
+    ads = await session.execute(query)
     ad_responses = []
 
-    # Construct the base URL for the images
     base_url = str(request.base_url).rstrip("/")
 
     for ad in ads.scalars():
@@ -299,6 +335,7 @@ async def get_all_ads(
             user_id=ad.user_id,
             images=image_urls,
             category=ad.category,
+            sub_category=ad.sub_category,
             condition=ad.condition,
         )
         ad_responses.append(ad_response)

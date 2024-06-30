@@ -15,6 +15,7 @@ async def test_update_ad_status_code(
     create_ad: Ad,
     default_user_headers: dict[str, str],
 ) -> None:
+    print(create_ad)
     ad_id = create_ad.json()["ad_id"]
     response = await client.put(
         app.url_path_for("update_ad", ad_id=ad_id),
@@ -23,6 +24,12 @@ async def test_update_ad_status_code(
             "title": "Updated weapon name",
             "description": "This is the updated weapons description",
             "price": 890,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
     assert response.status_code == status.HTTP_201_CREATED
@@ -40,6 +47,12 @@ async def test_update_ad_modify_database_entry(
         "title": "Updated weapon name",
         "description": "Updated description",
         "price": 690,
+        "category": "weapon",
+        "condition": "mint",
+        "images": [
+            "http://www.test-image.co/1234.jpg",
+            "http://www.test-image.co/1234.jpg",
+        ],
     }
 
     _ = await client.put(
@@ -69,6 +82,12 @@ async def test_update_unathorized_for_another_user(
             "title": "Unathorized update",
             "description": "Updated description",
             "price": 123,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
 
@@ -89,6 +108,12 @@ async def test_update_ad_not_found(
             "title": "Unathorized update",
             "description": "Updated description",
             "price": 123,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
 

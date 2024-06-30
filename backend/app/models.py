@@ -52,6 +52,8 @@ class User(Base):
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="user")
     confirmation_token: Mapped[str] = mapped_column(String, nullable=True)
     full_name: Mapped[str] = mapped_column(String(100))
+    phone_number: Mapped[str] = mapped_column(String(32))
+    location: Mapped[str] = mapped_column(String(100))
     is_customer: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=False)
     ads: Mapped[list["Ad"]] = relationship("Ad", back_populates="user")
@@ -89,6 +91,7 @@ class Ad(Base):
         "ImageUrl", back_populates="ad", cascade="all, delete-orphan", lazy="selectin"
     )
     category: Mapped[str] = mapped_column(String(256), nullable=False)
+    sub_category: Mapped[str] = mapped_column(String(256), nullable=False)
     condition: Mapped[str] = mapped_column(String(256), nullable=False)
 
 

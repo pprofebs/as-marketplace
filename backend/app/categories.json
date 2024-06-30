@@ -1,0 +1,97 @@
+{
+    "Airsoft Fegyverek": [
+        "Elektromos Airsoft Fegyverek (AEG)",
+        "Gázos Airsoft Fegyverek",
+        "Rugós Airsoft Fegyverek",
+        "HPA Airsoft Fegyverek",
+        "Pisztolyok",
+        "Puskák",
+        "Mesterlövész Puskák",
+        "Sörétes Puskák",
+        "Géppisztolyok",
+        "Géppuskák",
+        "Egyedi Építések"
+    ],
+    "Alkatrészek": [
+        "Csövek",
+        "Hop-Up Egységek",
+        "Sebességváltók",
+        "Motorok",
+        "Ravaszok",
+        "Tuskók",
+        "Előagyak",
+        "Sínrendszerek & Tartók",
+        "Lángrejtők & Hangtompítók",
+        "Távcsövek & Irányzékok",
+        "Markolatok & Kétlábak",
+        "Tárak",
+        "BB Töltők",
+        "Gáz & CO2 Tartályok",
+        "Gyors Töltők",
+        "Akkumulátorok & Töltők",
+        "Belső Alkatrészek (Fogaskerekek, Dugattyúk, stb.)",
+        "Külső Alkatrészek (Sínek, Karosszéria Készletek, stb.)"
+    ],
+    "Lőszer & Gránátok": [
+        "BB-k (Bio & Nem Bio)",
+        "Nyomjelző BB-k",
+        "Festéklabda BB-k",
+        "Gránátok (BB & Füst)",
+        "Pirotechnikai Eszközök"
+    ],
+    "Taktikai Felszerelés": [
+        "Taktikai Mellények",
+        "Lemez Tartók",
+        "Mellkas Felszerelések",
+        "Táskák & Tártartók",
+        "Hátizsákok",
+        "Tokok",
+        "Övek & Hámok",
+        "Bakancsok",
+        "Kesztyűk",
+        "Térd & Könyök Védők",
+        "Sisakok",
+        "Fejfedők (Sapka, Kalap, stb.)",
+        "Ghillie Öltönyök",
+        "Egyenruhák & BDU",
+        "Arcvédők",
+        "Szemvédelem (Szemüvegek & Szemüvegek)",
+        "Kommunikációs Felszerelés (Rádiók, Fejhallgatók, stb.)"
+    ],
+    "Karbantartás": [
+        "Tisztító Készletek",
+        "Kenőanyagok & Zsírok",
+        "Szerszám Készletek",
+        "Felújító Készletek",
+        "Csere Alkatrészek",
+        "Karbantartási Szolgáltatások"
+    ],
+    "Kiegészítők": [
+        "Célpontok",
+        "Kronográfok",
+        "Mezei Akadályok & Fedezék",
+        "Hordozható Barikádok",
+        "Elsősegély Készletek"
+    ],
+    "Egyéb": [
+        "Kiképzési Felszerelés",
+        "Replikák & Kiegészítők",
+        "Foltok & Jelvények",
+        "Airsoft Táskák & Tokok",
+        "Mezei Kamerák & Tartók",
+        "Harci Kések & Eszközök",
+        "Akkumulátorok & Töltők",
+        "Taktikai Zseblámpák",
+        "Lézer Irányzékok",
+        "Álcafesték & Szalag",
+        "Hidratáló Rendszerek"
+    ],
+    "Specifikus Márkák": [
+        "Specifikus Márkák (pl. Tokyo Marui, CYMA, G&G, stb.)"
+    ],
+    "Egyedi": [
+        "Egyedi Fegyverek",
+        "Egyedi Alkatrészek",
+        "Egyedi Felszerelések"
+    ]
+}

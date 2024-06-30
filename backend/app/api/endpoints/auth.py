@@ -181,6 +181,8 @@ async def register_new_user(
         email=new_user.email,
         hashed_password=get_password_hash(new_user.password),
         full_name=new_user.full_name,
+        phone_number=new_user.phone_number,
+        location=new_user.location,
         confirmation_token=confirmation_token,
         is_active=False,
     )

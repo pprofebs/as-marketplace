@@ -19,6 +19,12 @@ async def test_create_new_ad_status_code(
             "title": "test weapon",
             "description": "This is the weapons description",
             "price": 1000,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
     assert response.status_code == status.HTTP_201_CREATED
@@ -31,8 +37,14 @@ async def test_create_new_ad_without_login(
         app.url_path_for("create_new_ad"),
         json={
             "title": "test weapon",
-            "description": "This is another test",
-            "price": 1200,
+            "description": "This is the weapons description",
+            "price": 1000,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -47,14 +59,20 @@ async def test_create_new_ad_creates_record_in_db(
         app.url_path_for("create_new_ad"),
         headers=default_user_headers,
         json={
-            "title": "my test weapon",
-            "description": "This is a test description",
-            "price": 1200,
+            "title": "test weapon",
+            "description": "This is the weapons description",
+            "price": 1000,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
 
     ad_count = await session.scalar(
-        select(func.count()).where(Ad.title == "my test weapon")
+        select(func.count()).where(Ad.title == "test weapon")
     )
     assert ad_count == 1
 
@@ -67,9 +85,15 @@ async def test_new_ad_cannot_create_already_created_title(
         app.url_path_for("create_new_ad"),
         headers=default_user_headers,
         json={
-            "title": "my test weapon",
-            "description": "This is a test description",
-            "price": 1200,
+            "title": "test weapon",
+            "description": "This is the weapons description",
+            "price": 1000,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
 
@@ -79,9 +103,15 @@ async def test_new_ad_cannot_create_already_created_title(
         app.url_path_for("create_new_ad"),
         headers=default_user_headers,
         json={
-            "title": "my test weapon",
-            "description": "This is a test description",
-            "price": 1200,
+            "title": "test weapon",
+            "description": "This is the weapons description",
+            "price": 1000,
+            "category": "weapon",
+            "condition": "mint",
+            "images": [
+                "http://www.test-image.co/1234.jpg",
+                "http://www.test-image.co/1234.jpg",
+            ],
         },
     )
 

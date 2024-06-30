@@ -18,6 +18,13 @@ class UserCreateRequest(BaseRequest):
     email: EmailStr
     password: str
     full_name: str
+    phone_number: str
+    location: str
+
+
+class UserUpdateRequest(BaseModel):
+    phone_number: str
+    location: str
 
 
 class AdCreateRequest(BaseRequest):
@@ -26,4 +33,5 @@ class AdCreateRequest(BaseRequest):
     price: int
     images: list[str]
     category: str
+    sub_category: str
     condition: str

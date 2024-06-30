@@ -37,7 +37,6 @@ async def test_delete_ad_remove_entry_from_db(
     )
 
     ad = await session.scalar(select(Ad).where(Ad.ad_id == ad_id))
-    print(ad.__dict__)
     assert ad is None
 
 

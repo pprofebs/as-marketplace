@@ -14,8 +14,11 @@ class AccessTokenResponse(BaseResponse):
 
 
 class UserResponse(BaseResponse):
+    full_name: str
     user_id: str
     email: EmailStr
+    phone_number: str
+    location: str
 
 
 class ImageUrl(BaseModel):
