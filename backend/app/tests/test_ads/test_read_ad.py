@@ -59,46 +59,55 @@ async def test_get_all_ads_return_all_ads(
     second_user: User,
     second_user_headers: dict[str, str],
 ) -> None:
+    form_data = {
+        "title": "another test weapon",
+        "description": "This is the weapons description",
+        "price": 1200,
+        "mainCategory": "weapon",
+        "subCategory": "sub_weapon",
+        "condition": "mint",
+    }
+
+    files = [
+        ("images", ("test_image1.jpg", b"fake-image-bytes-1", "image/jpeg")),
+        ("images", ("test_image2.jpg", b"fake-image-bytes-2", "image/jpeg")),
+    ]
+
     ad_response = await client.post(
         app.url_path_for("create_new_ad"),
         headers=second_user_headers,
-        json={
-            "title": "another test weapon",
-            "description": "This is the weapons description",
-            "price": 1200,
-            "category": "weapon",
-            "condition": "mint",
-            "images": [
-                "http://www.test-image.co/1234.jpg",
-                "http://www.test-image.co/1234.jpg",
-            ],
-        },
+        data=form_data,
+        files=files,
     )
 
     response = await client.get(app.url_path_for("get_all_ads"))
-    assert response.json() == [
-        {
-            "ad_id": create_ad.json()["ad_id"],
-            "title": "test weapon",
-            "description": "This is the weapons description",
-            "user_id": default_user.user_id,
-            "images": [
-                {"url": "http://www.test-image.co/1234.jpg"},
-                {"url": "http://www.test-image.co/1234.jpg"},
-            ],
-            "category": "weapon",
-            "condition": "mint",
-        },
-        {
-            "ad_id": ad_response.json()["ad_id"],
-            "title": "another test weapon",
-            "description": "This is the weapons description",
-            "user_id": second_user.user_id,
-            "images": [
-                {"url": "http://www.test-image.co/1234.jpg"},
-                {"url": "http://www.test-image.co/1234.jpg"},
-            ],
-            "category": "weapon",
-            "condition": "mint",
-        },
-    ]
+    assert len(response.json()) == 2
+
+    expected_response_part1 = {
+        "ad_id": create_ad.json()["ad_id"],
+        "title": "test weapon",
+        "description": "This is the weapons description",
+        "price": 1000,
+        "user_id": default_user.user_id,
+        "category": "weapon",
+        "condition": "mint",
+    }
+
+    expected_response_part2 = {
+        "ad_id": ad_response.json()["ad_id"],
+        "title": "another test weapon",
+        "description": "This is the weapons description",
+        "price": 1200,
+        "user_id": second_user.user_id,
+        "category": "weapon",
+        "condition": "mint",
+    }
+
+    response_data = response.json()
+
+    assert {
+        key: response_data[0][key] for key in expected_response_part1
+    } == expected_response_part1
+    assert {
+        key: response_data[1][key] for key in expected_response_part2
+    } == expected_response_part2

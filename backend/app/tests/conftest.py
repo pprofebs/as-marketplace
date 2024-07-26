@@ -23,6 +23,8 @@ default_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087b"
 default_user_email = "geralt@wiedzmin.pl"
 default_user_password = "geralt"
 default_user_full_name = "geralt of rivia"
+default_user_phone_number = "+36123456789"
+default_user_location = "Debrecen"
 default_user_is_customer = False
 default_user_access_token = create_jwt_token(default_user_id).access_token
 
@@ -30,6 +32,8 @@ second_user_id = "b75365d9-7bf9-4f54-add5-aeab333a087c"
 second_user_email = "jean@wiedzmin.pl"
 second_user_password = "jean"
 second_user_full_name = "jean of rivia"
+second_user_phone_number = "+362198765432"
+second_user_location = "Budapest"
 second_user_is_customer = False
 second_user_access_token = create_jwt_token(second_user_id).access_token
 
@@ -138,6 +142,8 @@ async def fixture_default_user(
         user_id=default_user_id,
         email=default_user_email,
         hashed_password=default_hashed_password,
+        phone_number=default_user_phone_number,
+        location=default_user_location,
         full_name=default_user_full_name,
         is_customer=default_user_is_customer,
     )
@@ -155,6 +161,8 @@ async def fixture_second_user(
         user_id=second_user_id,
         email=second_user_email,
         hashed_password=second_hashed_password,
+        phone_number=second_user_phone_number,
+        location=second_user_location,
         full_name=second_user_full_name,
         is_customer=second_user_is_customer,
     )
@@ -179,19 +187,24 @@ async def fixture_create_ad(
     client: AsyncClient,
     default_user_headers: dict[str, str],
 ) -> Ad:
+    form_data = {
+        "title": "test weapon",
+        "description": "This is the weapons description",
+        "price": 1000,
+        "mainCategory": "weapon",
+        "subCategory": "sub_weapon",
+        "condition": "mint",
+    }
+
+    files = [
+        ("images", ("test_image1.jpg", b"fake-image-bytes-1", "image/jpeg")),
+        ("images", ("test_image2.jpg", b"fake-image-bytes-2", "image/jpeg")),
+    ]
+
     response = await client.post(
         app.url_path_for("create_new_ad"),
         headers=default_user_headers,
-        json={
-            "title": "test weapon",
-            "description": "This is the weapons description",
-            "price": 1000,
-            "category": "weapon",
-            "condition": "mint",
-            "images": [
-                "http://www.test-image.co/1234.jpg",
-                "http://www.test-image.co/1234.jpg",
-            ],
-        },
+        data=form_data,
+        files=files,
     )
     return response

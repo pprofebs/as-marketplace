@@ -53,7 +53,7 @@ async def test_delete_ad_unathorized_for_another_user(
     )
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
-    assert response.json() == {"detail": api_messages.AD_UNATHORIZED}
+    assert response.json() == {"detail": "Unauthorized to delete ad"}
 
 
 async def test_delete_ad_wrong_ad_id(

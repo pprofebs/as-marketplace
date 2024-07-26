@@ -1,4 +1,5 @@
 import uuid
+from uuid import uuid4
 
 from fastapi import status
 from httpx import AsyncClient
@@ -12,26 +13,38 @@ from app.models import Ad
 
 async def test_update_ad_status_code(
     client: AsyncClient,
-    create_ad: Ad,
+    create_ad: Ad,  # Ensure this is the type for create_ad
     default_user_headers: dict[str, str],
+    tmp_path,
 ) -> None:
-    print(create_ad)
     ad_id = create_ad.json()["ad_id"]
+
+    # Prepare image files in the temporary directory
+    file1_path = tmp_path / f"{uuid4()}.jpg"
+    file2_path = tmp_path / f"{uuid4()}.jpg"
+
+    file1_path.write_bytes(b"fake image data")
+    file2_path.write_bytes(b"fake image data")
+
+    # Use multipart/form-data to send files
     response = await client.put(
         app.url_path_for("update_ad", ad_id=ad_id),
         headers=default_user_headers,
-        json={
+        data={
             "title": "Updated weapon name",
             "description": "This is the updated weapons description",
             "price": 890,
             "category": "weapon",
             "condition": "mint",
+        },
+        files={
             "images": [
-                "http://www.test-image.co/1234.jpg",
-                "http://www.test-image.co/1234.jpg",
+                (file1_path.name, file1_path.open("rb"), "image/jpeg"),
+                (file2_path.name, file2_path.open("rb"), "image/jpeg"),
             ],
         },
     )
+
     assert response.status_code == status.HTTP_201_CREATED
 
 
