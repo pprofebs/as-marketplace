@@ -13,6 +13,14 @@ function AdsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [categories, setCategories] = useState({});
 
+  const conditionLabels = {
+    new: 'Új',
+    very_good: 'Nagyon jó',
+    good: 'Jó',
+    fair: 'Elfogadható',
+    for_parts_or_not_working: 'Alkatrészeknek vagy nem működő'
+  };
+
   useEffect(() => {
     fetchAds();
   }, [searchQuery, filterCondition, filterCategory, filterSubCategory, currentPage]);
@@ -90,10 +98,10 @@ function AdsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen flex flex-col items-center py-8 px-4 bg-gray-100">
       <h1 className="text-3xl font-semibold mb-8 text-center">Hirdetések</h1>
 
-      <div className="mb-6 flex flex-col md:flex-row items-center justify-center">
+      <div className="mb-6 flex flex-col md:flex-row items-center justify-center w-full max-w-7xl">
         <input
           type="text"
           placeholder="Keresés..."
@@ -111,7 +119,7 @@ function AdsPage() {
       </div>
 
       {showFilters && (
-        <div className="mb-6 flex flex-col md:flex-row items-center justify-center">
+        <div className="mb-6 flex flex-col md:flex-row items-center justify-center w-full max-w-7xl">
           <select
             value={filterCondition}
             onChange={handleFilterConditionChange}
@@ -153,7 +161,7 @@ function AdsPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-7xl">
         {currentAds.map((ad) => (
           <div key={ad.ad_id} className="bg-white shadow-lg rounded-lg overflow-hidden">
             {ad.images.length > 0 ? (
@@ -164,7 +172,7 @@ function AdsPage() {
             <div className="p-4">
               <h2 className="text-lg font-semibold mb-2">{ad.title}</h2>
               <p className="text-gray-800 font-semibold mb-2">HUF {ad.price}</p>
-              <p className="text-gray-600 mb-2">{ad.condition} - {ad.category}</p>
+              <p className="text-gray-600 mb-2">Állapot: {conditionLabels[ad.condition]} - {ad.category}</p>
               <Link to={`/termekek/${ad.ad_id}`}>
                 <button
                   onClick={() => viewAdDetails(ad.ad_id)}
@@ -178,7 +186,7 @@ function AdsPage() {
         ))}
       </div>
 
-      <div className="mt-8 flex justify-center">
+      <div className="mt-8 flex justify-center w-full max-w-7xl">
         <button
           onClick={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}

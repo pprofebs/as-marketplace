@@ -112,13 +112,13 @@ const LoginPage = () => {
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
           >
-            Sign In
+            Bejelentkezés
           </button>
         </form>
         {/* Link to Sign Up */}
         <p className="text-sm text-gray-600 mt-4 text-center">
           Még nem regisztráltál?{' '}
-          <Link to="/signup" className="text-blue-500 hover:text-blue-600">
+          <Link to="/regisztracio" className="text-blue-500 hover:text-blue-600">
             Regisztráció
           </Link>
         </p>

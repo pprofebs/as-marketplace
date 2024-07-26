@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook from react-router-dom
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 
 function UserProfile() {
@@ -9,7 +9,9 @@ function UserProfile() {
   const [ads, setAds] = useState([]);
   const [stats, setStats] = useState({ totalAds: 0, totalViews: 0, totalClicks: 0 });
   const [editAd, setEditAd] = useState(null);
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const [isModalVisible, setIsModalVisible] = useState(false); // State for modal visibility
+  const [isEditButtonVisible, setIsEditButtonVisible] = useState(true); // State to control edit button visibility
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!token) return;
@@ -55,39 +57,37 @@ function UserProfile() {
     if (!editAd) return;
 
     try {
-        const formData = new FormData();
-        formData.append('title', editAd.title);
-        formData.append('description', editAd.description);
-        formData.append('price', editAd.price);
-        formData.append('category', editAd.category);
-        formData.append('condition', editAd.condition);
+      const formData = new FormData();
+      formData.append('title', editAd.title);
+      formData.append('description', editAd.description);
+      formData.append('price', editAd.price);
+      formData.append('category', editAd.category);
+      formData.append('condition', editAd.condition);
 
-        if (editAd.images && editAd.images.length > 0) {
-            for (let i = 0; i < editAd.images.length; i++) {
-                formData.append('images', editAd.images[i]);
-            }
+      if (editAd.images && editAd.images.length > 0) {
+        for (let i = 0; i < editAd.images.length; i++) {
+          formData.append('images', editAd.images[i]);
         }
+      }
 
-       console.log(formData);
+      await axios.put(`http://localhost:8000/ads/${editAd.ad_id}/update`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-        await axios.put(`http://localhost:8000/ads/${editAd.ad_id}/update`, formData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-
-        setEditAd(null);
-        const response = await axios.get('http://localhost:8000/ads/me', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        setAds(response.data || []);
+      setEditAd(null);
+      const response = await axios.get('http://localhost:8000/ads/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAds(response.data || []);
     } catch (err) {
-        console.error('Error updating ad', err);
+      console.error('Error updating ad', err);
     }
-};
+  };
 
   const handleDeleteAd = async (adId) => {
     try {
@@ -105,7 +105,23 @@ function UserProfile() {
   };
 
   const handleSaveUserInfo = async () => {
-    // Implement user info save logic here
+    if (!user) return;
+
+    try {
+      await axios.put('http://localhost:8000/users/me', {
+        phone_number: user.phone_number,
+        location: user.location,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setIsEditButtonVisible(true); // Ensure the edit button is visible
+      setIsModalVisible(false); // Close the modal
+    } catch (err) {
+      console.error('Error saving user information', err);
+    }
   };
 
   const handleFileChange = (event) => {
@@ -118,46 +134,61 @@ function UserProfile() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen flex flex-col items-center py-8 px-4 bg-gray-100">
       <h1 className="text-3xl font-semibold mb-4">Profilom</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Felhasználói információ</h2>
           {user && (
             <div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Felhasználónév</label>
-                <input
-                  type="text"
-                  value={user.username}
-                  className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => setUser({ ...user, username: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Email</label>
-                <input
-                  type="email"
-                  value={user.email}
-                  className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => setUser({ ...user, email: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Város</label>
-                <input
-                  type="text"
-                  value={user.location}
-                  className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => setUser({ ...user, location: e.target.value })}
-                />
-              </div>
-              <button
-                onClick={handleSaveUserInfo}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Save Changes
-              </button>
+              {isEditButtonVisible && (
+                <button
+                  onClick={() => setIsModalVisible(true)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-4"
+                >
+                  Edit Information
+                </button>
+              )}
+              {/* Modal */}
+              {isModalVisible && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
+                  <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
+                    <h2 className="text-xl font-semibold mb-4">Edit User Information</h2>
+                    <div className="mb-4">
+                      <label className="block text-gray-700">Város</label>
+                      <input
+                        type="text"
+                        value={user.location}
+                        className="w-full p-2 border border-gray-300 rounded"
+                        onChange={(e) => setUser({ ...user, location: e.target.value })}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700">Telefon</label>
+                      <input
+                        type="text"
+                        value={user.phone_number || ''}
+                        className="w-full p-2 border border-gray-300 rounded"
+                        onChange={(e) => setUser({ ...user, phone_number: e.target.value })}
+                      />
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={handleSaveUserInfo}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      >
+                        Save Changes
+                      </button>
+                      <button
+                        onClick={() => setIsModalVisible(false)}
+                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -171,14 +202,13 @@ function UserProfile() {
         </div>
       </div>
       {ads.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-7xl">
           <h2 className="text-xl font-semibold mb-4">Hirdetéseim</h2>
           <div className="grid grid-cols-1 gap-4">
             {ads.map((ad) => (
               <div key={ad.ad_id} className="flex justify-between items-center p-4 border border-gray-300 rounded">
                 <div>
                   <h3 className="text-lg font-semibold">{ad.title}</h3>
-                  <p className="text-gray-700">{ad.description}</p>
                 </div>
                 <div className="flex space-x-2">
                   <button
@@ -202,79 +232,6 @@ function UserProfile() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      )}
-      {editAd && (
-        <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
-          <h2 className="text-xl font-semibold mb-4">Update Ad</h2>
-          <div className="mb-4">
-            <label className="block text-gray-700">Title</label>
-            <input
-              type="text"
-              value={editAd.title}
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setEditAd({ ...editAd, title: e.target.value })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Description</label>
-            <input
-              type="text"
-              value={editAd.description}
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setEditAd({ ...editAd, description: e.target.value })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Price</label>
-            <input
-              type="number"
-              value={editAd.price}
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setEditAd({ ...editAd, price: parseFloat(e.target.value) })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Category</label>
-            <input
-              type="text"
-              value={editAd.category}
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setEditAd({ ...editAd, category: e.target.value })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Condition</label>
-            <input
-              type="text"
-              value={editAd.condition}
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setEditAd({ ...editAd, condition: e.target.value })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Images</label>
-            <input
-              type="file"
-              multiple
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={handleFileChange}
-            />
-          </div>
-          <div className="flex space-x-2">
-            <button
-              onClick={handleSaveAd}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Save Changes
-            </button>
-            <button
-              onClick={() => setEditAd(null)}
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              Cancel
-            </button>
           </div>
         </div>
       )}

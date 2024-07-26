@@ -76,10 +76,10 @@ const Navbar = () => {
         </Link>
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           {!token ? (
-            <div className="flex space-x-4">
+            <>
               <Link
                 to="/belepes"
-                className="hidden md:inline-flex items-center justify-center text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300"
+                className="hidden md:inline-flex items-center justify-center text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300 m-5"
               >
                 Bejelentkezés
               </Link>
@@ -90,7 +90,7 @@ const Navbar = () => {
               >
                 Regisztráció
               </Link>
-            </div>
+            </>
           ) : (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -192,7 +192,7 @@ const Navbar = () => {
             </li>
             {!token ? (
               <>
-                <li>
+                <li className="md:hidden">
                   <Link
                     to="/belepes"
                     className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
@@ -200,12 +200,12 @@ const Navbar = () => {
                     Bejelentkezés
                   </Link>
                 </li>
-                <li>
+                <li className="md:hidden">
                   <Link
                     to="/regisztracio"
-                    className="block py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200"
+                    className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   >
-                    Regisztráció
+                    Regisztracio
                   </Link>
                 </li>
               </>

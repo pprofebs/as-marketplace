@@ -41,6 +41,8 @@ const ProductSection = () => {
               ad_id={ad.ad_id}
               name={ad.title}
               price={ad.price}
+              condition={ad.condition}
+              category={ad.category}
               image={ad.images.length > 0 ? ad.images[0].url : ""}
             />
           ))
