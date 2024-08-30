@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import ProductCard from "../Cards/ProductCard";
+import ProductCard from "../Cards/productCard"
 import { FaChartLine, FaEye, FaShoppingCart } from "react-icons/fa";
 
 const ProductSection = () => {

@@ -87,6 +87,14 @@ function AdsPage() {
     setShowFilters(!showFilters);
   };
 
+  const clearFilters = () => {
+    setSearchQuery('');
+    setFilterCondition('');
+    setFilterCategory('');
+    setFilterSubCategory('');
+    setCurrentPage(1);
+  };
+
   const indexOfLastAd = currentPage * adsPerPage;
   const indexOfFirstAd = indexOfLastAd - adsPerPage;
   const currentAds = ads.slice(indexOfFirstAd, indexOfLastAd);
@@ -158,6 +166,12 @@ function AdsPage() {
               ))}
             </select>
           )}
+          <button
+            onClick={clearFilters}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ml-0 md:ml-4 mt-4 md:mt-0"
+          >
+            Szűrők törlése
+          </button>
         </div>
       )}
 
