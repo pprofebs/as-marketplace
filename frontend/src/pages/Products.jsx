@@ -101,9 +101,62 @@ function AdsPage() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const viewAdDetails = (adId) => {
+  const viewAdDetails = async (adId) => {
     console.log('Viewing details of ad with ID:', adId);
-  };
+
+    const guest_uuid = localStorage.getItem('guest_uuid'); // Retrieve guest_uuid from localStorage
+
+    let user_id = null;
+    const token = localStorage.getItem('ASAccessToken'); // Assuming you store the auth token in localStorage
+    console.log(token);
+
+    if (token) {
+        try {
+            // Fetch the user_id by sending a request to '/users/me'
+            const response = await fetch('http://localhost:8000/users/me', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                user_id = data.user_id; // Assuming the response has the user ID in the 'id' field
+            } else {
+                console.error('Failed to fetch user information');
+            }
+        } catch (error) {
+            console.error('Error fetching user information:', error.message);
+        }
+    }
+
+    // Tracking the ad click
+    try {
+        const requestBody = user_id
+            ? { user_id: user_id, guest_uuid: guest_uuid || null } // Send both user_id and guest_uuid if authenticated
+            : { guest_uuid: guest_uuid || null }; // Send only guest_uuid if unauthenticated
+
+        console.log(requestBody);
+
+        const response = await fetch(`http://127.0.0.1:8000/analytics/ads/${adId}/click`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to track ad click');
+        }
+        console.log('Ad click tracked successfully');
+    } catch (error) {
+        console.error('Error tracking ad click:', error.message);
+    }
+};
 
   return (
     <div className="min-h-screen flex flex-col items-center py-8 px-4 bg-gray-100">

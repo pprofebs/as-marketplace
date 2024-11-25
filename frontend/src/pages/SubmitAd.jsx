@@ -11,7 +11,8 @@ import DescriptionTextarea from "../components/features/Textarea/DescriptionText
 import ImageUpload from "../components/features/Form/ImageUpload";
 
 const SubmitAd = () => {
-  const [token] = useContext(UserContext);
+  // Destructure the context object to access token
+  const { token } = useContext(UserContext);
   const navigate = useNavigate();
   const [imagePreviews, setImagePreviews] = useState([]);
   const [formData, setFormData] = useState({

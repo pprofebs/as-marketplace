@@ -9,7 +9,9 @@ const LoginPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [, setToken] = useContext(UserContext);
+
+  // Destructure the context object to access setToken
+  const { setToken } = useContext(UserContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

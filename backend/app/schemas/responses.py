@@ -35,3 +35,8 @@ class AdResponse(BaseResponse):
     category: str
     condition: str
     user_id: str
+
+
+class AdClicks(BaseResponse):
+    ad_id: str
+    unique_clicks: int

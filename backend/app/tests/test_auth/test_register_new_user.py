@@ -19,6 +19,8 @@ async def test_register_new_user_status_code(
             "email": "test@email.com",
             "password": "testtesttest",
             "full_name": "test edward",
+            "phone_number": "+3612345678",
+            "location": "Debrecen",
         },
     )
 
@@ -35,6 +37,8 @@ async def test_register_new_user_creates_record_in_db(
             "email": "test@email.com",
             "password": "testtesttest",
             "full_name": "test edward",
+            "phone_number": "+3612345678",
+            "location": "Debrecen",
         },
     )
 
@@ -52,6 +56,8 @@ async def test_register_new_user_cannot_create_already_created_user(
         email="test@email.com",
         hashed_password="bla",
         full_name="test edward",
+        phone_number="+36301234567",
+        location="Debrecen",
     )
     session.add(user)
     await session.commit()
@@ -62,6 +68,8 @@ async def test_register_new_user_cannot_create_already_created_user(
             "email": "test@email.com",
             "password": "testtesttest",
             "full_name": "test edward",
+            "phone_number": "+3612345678",
+            "location": "Debrecen",
         },
     )
 
@@ -78,6 +86,8 @@ async def test_new_user_email_confirmation(
         email="test@email.com",
         hashed_password="bla",
         full_name="test edward",
+        phone_number="+36123456789",
+        location="Debrecen",
         is_customer=False,
         is_active=False,
         confirmation_token=token,

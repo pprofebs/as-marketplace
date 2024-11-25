@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api import api_messages
-from app.api.endpoints import ads, auth, categories, users
+from app.api.endpoints import ads, analytics, auth, categories, users
 
 auth_router = APIRouter()
 auth_router.include_router(auth.router, prefix="/auth", tags=["auth"])
@@ -38,3 +38,8 @@ ad_router.include_router(ads.router, prefix="/ads", tags=["ads"])
 
 categories_router = APIRouter()
 categories_router.include_router(categories.router, tags=["categories"])
+
+analytics_router = APIRouter()
+analytics_router.include_router(
+    analytics.router, prefix="/analytics", tags=["analytics"]
+)

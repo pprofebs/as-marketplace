@@ -4,7 +4,8 @@ import { UserContext } from "../../../context/UserContext";
 import { FaUser } from "react-icons/fa";
 
 const Navbar = () => {
-  const [token, setToken] = useContext(UserContext);
+  // Destructure the context as an object
+  const { token, setToken, guestUuid } = useContext(UserContext);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userData, setUserData] = useState(null);

@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api import api_messages, deps
-from app.models import Ad, ImageUrl, User
+from app.models import Ad, AdStatus, ImageUrl, User
 from app.schemas.responses import AdResponse
 
 router = APIRouter()
@@ -96,6 +96,7 @@ async def create_new_ad(
         sub_category=subCategory,
         condition=condition,
         user_id=current_user.user_id,
+        status=AdStatus.ACTIVE,
     )
 
     session.add(new_ad)

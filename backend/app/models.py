@@ -1,25 +1,12 @@
-# SQL Alchemy models declaration.
-# https://docs.sqlalchemy.org/en/20/orm/quickstart.html#declare-models
-# mapped_column syntax from SQLAlchemy 2.0.
-
-# https://alembic.sqlalchemy.org/en/latest/tutorial.html
-# Note, it is used by alembic migrations logic, see `alembic/env.py`
-
-# Alembic shortcuts:
-# # create migration
-# alembic revision --autogenerate -m "migration_name"
-
-# # apply all migrations
-# alembic upgrade head
-
-
 import uuid
 from datetime import datetime
+from enum import Enum as PyEnum
 
 from sqlalchemy import (
     BigInteger,
     Boolean,
     DateTime,
+    Enum,
     Float,
     ForeignKey,
     String,
@@ -74,6 +61,12 @@ class RefreshToken(Base):
     user: Mapped["User"] = relationship(back_populates="refresh_tokens")
 
 
+class AdStatus(PyEnum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    SOLD = "sold"
+
+
 class Ad(Base):
     __tablename__ = "ads"
 
@@ -93,6 +86,33 @@ class Ad(Base):
     category: Mapped[str] = mapped_column(String(256), nullable=False)
     sub_category: Mapped[str] = mapped_column(String(256), nullable=False)
     condition: Mapped[str] = mapped_column(String(256), nullable=False)
+    clicks: Mapped[list["AdClick"]] = relationship(
+        "AdClick",
+        back_populates="ad",
+        cascade="all, delete-orphan",  # Added cascade behavior
+    )
+    status: Mapped[AdStatus] = mapped_column(
+        Enum(AdStatus), nullable=False, default=AdStatus.ACTIVE
+    )
+
+
+class AdClick(Base):
+    __tablename__ = "ad_clicks"
+
+    click_id: Mapped[str] = mapped_column(
+        Uuid(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
+    )
+    ad_id: Mapped[str] = mapped_column(
+        Uuid(as_uuid=False),
+        ForeignKey("ads.ad_id", ondelete="CASCADE"),
+        nullable=False,  # Added CASCADE
+    )
+    ad: Mapped["Ad"] = relationship("Ad", back_populates="clicks")
+    user_id: Mapped[str] = mapped_column(String(256), nullable=True)
+    guest_uuid: Mapped[str] = mapped_column(String(256), nullable=True)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class ImageUrl(Base):

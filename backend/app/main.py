@@ -3,7 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api.api_router import ad_router, api_router, auth_router, categories_router
+from app.api.api_router import (
+    ad_router,
+    analytics_router,
+    api_router,
+    auth_router,
+    categories_router,
+)
 from app.core.config import get_settings
 
 UPLOAD_DIRECTORY = "uploads"
@@ -20,6 +26,7 @@ app.include_router(auth_router)
 app.include_router(api_router)
 app.include_router(ad_router)
 app.include_router(categories_router)
+app.include_router(analytics_router)
 
 # Sets all CORS enabled origins
 app.add_middleware(

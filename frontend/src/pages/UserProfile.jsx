@@ -4,38 +4,38 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 
 function UserProfile() {
-  const [token] = useContext(UserContext);
+  const { token, guestUuid } = useContext(UserContext); // Destructure the context
   const [user, setUser] = useState(null);
   const [ads, setAds] = useState([]);
   const [stats, setStats] = useState({ totalAds: 0, totalViews: 0, totalClicks: 0 });
   const [editAd, setEditAd] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false); // State for modal visibility
-  const [isEditButtonVisible, setIsEditButtonVisible] = useState(true); // State to control edit button visibility
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditButtonVisible, setIsEditButtonVisible] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) return;
+    if (!token && !guestUuid) return;
 
-    // Fetch user information
     const fetchUser = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUser(response.data);
-      } catch (err) {
-        console.error('Error fetching user data', err);
+      if (token) {
+        try {
+          const response = await axios.get('http://localhost:8000/users/me', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUser(response.data);
+        } catch (err) {
+          console.error('Error fetching user data', err);
+        }
       }
     };
 
-    // Fetch user ads
     const fetchAds = async () => {
       try {
         const response = await axios.get('http://localhost:8000/ads/me', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token || guestUuid}`,
           },
         });
         setAds(response.data || []);
@@ -47,7 +47,7 @@ function UserProfile() {
 
     fetchUser();
     fetchAds();
-  }, [token]);
+  }, [token, guestUuid]);
 
   const handleUpdateAd = (ad) => {
     setEditAd(ad);
@@ -97,7 +97,6 @@ function UserProfile() {
         },
       });
 
-      // Refresh ads list
       setAds(ads.filter(ad => ad.ad_id !== adId));
     } catch (err) {
       console.error('Error deleting ad', err);
@@ -117,8 +116,8 @@ function UserProfile() {
         },
       });
 
-      setIsEditButtonVisible(true); // Ensure the edit button is visible
-      setIsModalVisible(false); // Close the modal
+      setIsEditButtonVisible(true);
+      setIsModalVisible(false);
     } catch (err) {
       console.error('Error saving user information', err);
     }
@@ -130,7 +129,7 @@ function UserProfile() {
   };
 
   const handleViewAd = (adId) => {
-    navigate(`/termekek/${adId}`); // Redirect to the ad detail page
+    navigate(`/termekek/${adId}`);
   };
 
   return (
@@ -146,10 +145,9 @@ function UserProfile() {
                   onClick={() => setIsModalVisible(true)}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-4"
                 >
-                  Edit Information
+                  Adataim Szerkesztése
                 </button>
               )}
-              {/* Modal */}
               {isModalVisible && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
                   <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
